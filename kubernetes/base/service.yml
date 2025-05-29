@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: projectify-db
+spec:
+  selector:
+    app: projectify-db
+    rol: db
+  ports:
+    - port: 80
+      targetPort: 80

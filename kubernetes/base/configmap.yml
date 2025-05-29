@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: projectify-db
+data:
+  DEBUGGER: "False"
+  WEB_APP_VERSION: "0.1.0"
+  WEP_APP_TITLE: projectify-db
+  WEP_APP_DESCRIPTION: Database service for Projectify
+  ENVIRONMENT: dev
+  POSTGRES_DATABASE_URL: postgres://postgres:BAOy7mc0ytFtM1qE@localhost:5432/projectify_dev_db
+  DEFAULT_DATA: "False"

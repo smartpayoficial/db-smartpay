@@ -1,0 +1,51 @@
+# pull official base image
+ARG BASE_IMAGE=python
+ARG IMAGE_TAG=3.9-slim-buster
+
+FROM ${BASE_IMAGE}:${IMAGE_TAG} AS requirements-image
+
+# set working directory
+WORKDIR /usr/src/app
+
+# set environment varibles
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install system dependencies
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get clean
+
+# install python dependencies
+RUN pip install pipenv --no-cache-dir
+COPY Pipfile* ./
+RUN pipenv requirements > requirements.txt
+
+# add app
+FROM ${BASE_IMAGE}:${IMAGE_TAG} AS compile-image
+WORKDIR /usr/src/app
+COPY --from=requirements-image /usr/src/app/requirements.txt /usr/src/app/requirements.txt
+
+# set environment varibles
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# install system dependencies
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y \
+  curl \
+  && apt-get clean \
+  && curl -O https://bootstrap.pypa.io/get-pip.py \
+  && python get-pip.py \
+  && python -m venv /home/venv
+
+ENV PATH="/home/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM ${BASE_IMAGE}:${IMAGE_TAG} AS runtime-image
+ENV PYTHONUNBUFFERED TRUE
+COPY --from=compile-image /home/venv /home/venv
+ENV PATH="/home/venv/bin:$PATH"
+WORKDIR /usr/src/app
+EXPOSE 80
+COPY . .

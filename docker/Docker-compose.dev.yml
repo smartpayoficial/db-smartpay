@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  projectify-db-api:
+    image: projectify-db-api
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: uvicorn app.main:app --reload --workers 1 --host 0.0.0.0 --port 8002
+    volumes:
+      - ../:/usr/src/app/
+    ports:
+      - 8002:8002
+      - 10001:10001
+    environment:
+      - DEBUGGER=False
+      - WEB_APP_VERSION=0.1.0
+      - WEP_APP_TITLE=projectify-db
+      - WEP_APP_DESCRIPTION=Database service for Projectify
+      - ENVIRONMENT=dev
+      - POSTGRES_DATABASE_URL=postgres://postgres:postgres@projectify-db:5432/projectify_dev_db
+      - DEFAULT_DATA=False
+    networks:
+      - projectify
+
+  projectify-db:
+    image: projectify-db
+    build:
+      context: ../db
+      dockerfile: Dockerfile
+    ports:
+      - "5437:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - projectify-db:/var/lib/postgresql/data
+    networks:
+      - projectify
+
+volumes:
+  projectify-db:
+    external: true
+
+networks:
+  projectify:
+    external: true

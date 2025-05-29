@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2beta29
+kind: Config
+metadata:
+  name: at-pronostico-backend
+build:
+  artifacts:
+    - image: gcr.io/charliebertvg/projectify/projectify-db
+      docker:
+        dockerfile: docker/Dockerfile.prod
+deploy:
+  kustomize:
+    paths:
+      - "kubernetes/overlays/dev"
+profiles:
+- name: prod
+  build:
+    artifacts:
+    - image: gcr.io/charliebertvg/projectify/projectify-db
+      docker:
+        dockerfile: docker/Dockerfile.prod
+  deploy:
+    kustomize:
+      paths:
+        - "kubernetes/overlays/prod"
+        #portforward debug
+portForward:
+  - resourceType: deployment
+    resourceName: projectify-db
+    port: 80
+    localPort: 8900
