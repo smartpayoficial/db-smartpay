@@ -1,2 +1,2 @@
-CREATE DATABASE projectify_dev_db;
-CREATE DATABASE projectify_test_db;
+CREATE DATABASE smartpay_dev_db;
+CREATE DATABASE smartpay_test_db;

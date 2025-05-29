@@ -5,5 +5,5 @@ resources:
 - ./configmap.yml
 - ./service.yml
 commonLabels:
-  app: projectify-db
+  app: smartpay-db
   rol: db

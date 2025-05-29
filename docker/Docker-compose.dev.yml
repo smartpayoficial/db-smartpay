@@ -1,8 +1,8 @@
 version: "3.9"
 
 services:
-  projectify-db-api:
-    image: projectify-db-api
+  smartpay-db-api:
+    image: smartpay-db-api
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -15,16 +15,16 @@ services:
     environment:
       - DEBUGGER=False
       - WEB_APP_VERSION=0.1.0
-      - WEP_APP_TITLE=projectify-db
-      - WEP_APP_DESCRIPTION=Database service for Projectify
+      - WEP_APP_TITLE=smartpay-db
+      - WEP_APP_DESCRIPTION=Database service for SmartPay
       - ENVIRONMENT=dev
-      - POSTGRES_DATABASE_URL=postgres://postgres:postgres@projectify-db:5432/projectify_dev_db
+      - POSTGRES_DATABASE_URL=postgres://postgres:postgres@smartpay-db:5432/smartpay_dev_db
       - DEFAULT_DATA=False
     networks:
-      - projectify
+      - smartpay
 
-  projectify-db:
-    image: projectify-db
+  smartpay-db:
+    image: smartpay-db
     build:
       context: ../db
       dockerfile: Dockerfile
@@ -34,14 +34,14 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     volumes:
-      - projectify-db:/var/lib/postgresql/data
+      - smartpay-db:/var/lib/postgresql/data
     networks:
-      - projectify
+      - smartpay
 
 volumes:
-  projectify-db:
+  smartpay-db:
     external: true
 
 networks:
-  projectify:
+  smartpay:
     external: true

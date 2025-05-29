@@ -1,30 +1,32 @@
-apiVersion: skaffold/v2beta29
+apiVersion: skaffold/v2beta26
 kind: Config
 metadata:
-  name: at-pronostico-backend
+  name: smartpay-db
 build:
   artifacts:
-    - image: gcr.io/charliebertvg/projectify/projectify-db
+    - image: gcr.io/charliebertvg/smartpay/smartpay-db
+      context: .
       docker:
-        dockerfile: docker/Dockerfile.prod
+        dockerfile: docker/Dockerfile
 deploy:
   kustomize:
     paths:
-      - "kubernetes/overlays/dev"
+      - kubernetes/overlays/dev
 profiles:
 - name: prod
   build:
     artifacts:
-    - image: gcr.io/charliebertvg/projectify/projectify-db
+    - image: gcr.io/charliebertvg/smartpay/smartpay-db
+      context: .
       docker:
         dockerfile: docker/Dockerfile.prod
   deploy:
     kustomize:
       paths:
-        - "kubernetes/overlays/prod"
+        - kubernetes/overlays/prod
         #portforward debug
 portForward:
-  - resourceType: deployment
-    resourceName: projectify-db
-    port: 80
-    localPort: 8900
+  - resourceType: service
+    resourceName: smartpay-db
+    port: 8002
+    localPort: 8002

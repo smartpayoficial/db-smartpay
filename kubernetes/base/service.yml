@@ -1,11 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: projectify-db
+  name: smartpay-db
 spec:
   selector:
-    app: projectify-db
-    rol: db
+    app: smartpay-db
   ports:
-    - port: 80
-      targetPort: 80
+  - port: 8002
+    targetPort: 8002
