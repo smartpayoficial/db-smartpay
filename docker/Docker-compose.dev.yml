@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   smartpay-db-api:
     image: smartpay-db-api
@@ -22,6 +20,9 @@ services:
       - DEFAULT_DATA=False
     networks:
       - smartpay
+    depends_on:
+      smartpay-db:
+        condition: service_healthy
 
   smartpay-db:
     image: smartpay-db
@@ -33,10 +34,16 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=smartpay_dev_db
     volumes:
       - smartpay-db:/var/lib/postgresql/data
     networks:
       - smartpay
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   smartpay-db:

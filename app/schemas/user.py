@@ -1,27 +1,39 @@
+from enum import Enum
+from typing import Optional
+from uuid import UUID
+
 from pydantic import BaseModel
 
 
-class CreateUser(BaseModel):
-    username: str
-    password: str
+class UserState(str, Enum):
+    ACTIVE = "Active"
+    INACTIVE = "Inactive"
+
+
+class UserBase(BaseModel):
+    city_id: UUID
+    dni: str
+    first_name: str
+    middle_name: Optional[str]
+    last_name: str
+    second_last_name: Optional[str]
     email: str
+    prefix: str
+    phone: str
+    address: str
+    state: UserState = UserState.ACTIVE
 
 
-class SearchUser(BaseModel):
-    username: str
+class UserCreate(UserBase):
+    pass
 
 
-class UpdateUser(BaseModel):
-    username: str
-    password: str
-    email: str
+class UserUpdate(UserBase):
+    pass
 
 
-class UserDB(BaseModel):
-    id: int
-    username: str
-    password: str
-    email: str
+class UserDB(UserBase):
+    user_id: UUID
 
     class Config:
         orm_mode = True
