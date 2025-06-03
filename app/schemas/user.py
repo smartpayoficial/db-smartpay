@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 from app.infra.postgres.models.user import UserState
 
@@ -15,7 +15,12 @@ class UserBase(BaseModel):
     last_name: str
     second_last_name: Optional[str]
     email: EmailStr
-    prefix: str
+    prefix: str = Field(
+        ...,
+        max_length=4,
+        min_length=1,
+        description="Prefijo telefónico (máximo 4 caracteres)",
+    )
     phone: str
     address: str
     state: UserState = UserState.ACTIVE

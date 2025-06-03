@@ -11,10 +11,10 @@ class DeviceState(str, Enum):
 
 class Device(Model):
     device_id = fields.UUIDField(pk=True)
-    enrolment = fields.ForeignKeyField("models.Enrolment", related_name="devices")
+    enrolment = fields.OneToOneField("models.Enrolment", related_name="device")
     name = fields.CharField(max_length=80)
-    imei = fields.CharField(max_length=15)
-    imei_two = fields.CharField(max_length=15)
+    imei = fields.CharField(max_length=15, unique=True)
+    imei_two = fields.CharField(max_length=15, unique=True)
     serial_number = fields.CharField(max_length=20)
     model = fields.CharField(max_length=40)
     brand = fields.CharField(max_length=40)

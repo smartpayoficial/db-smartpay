@@ -82,10 +82,10 @@ CREATE TABLE IF NOT EXISTS "enrolment" (
 -- Create device table
 CREATE TABLE IF NOT EXISTS "device" (
     device_id UUID PRIMARY KEY,
-    enrolment_id UUID NOT NULL REFERENCES "enrolment"(enrolment_id),
+    enrolment_id UUID NOT NULL UNIQUE REFERENCES "enrolment"(enrolment_id),
     name VARCHAR(80) NOT NULL,
-    imei VARCHAR(15) NOT NULL,
-    imei_two VARCHAR(15) NOT NULL,
+    imei VARCHAR(15) NOT NULL UNIQUE,
+    imei_two VARCHAR(15) NOT NULL UNIQUE,
     serial_number VARCHAR(20) NOT NULL,
     model VARCHAR(40) NOT NULL,
     brand VARCHAR(40) NOT NULL,
