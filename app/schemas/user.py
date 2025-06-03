@@ -1,13 +1,10 @@
-from enum import Enum
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
-
-class UserState(str, Enum):
-    ACTIVE = "Active"
-    INACTIVE = "Inactive"
+from app.infra.postgres.models.user import UserState
 
 
 class UserBase(BaseModel):
@@ -17,7 +14,7 @@ class UserBase(BaseModel):
     middle_name: Optional[str]
     last_name: str
     second_last_name: Optional[str]
-    email: str
+    email: EmailStr
     prefix: str
     phone: str
     address: str
@@ -34,6 +31,8 @@ class UserUpdate(UserBase):
 
 class UserDB(UserBase):
     user_id: UUID
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True

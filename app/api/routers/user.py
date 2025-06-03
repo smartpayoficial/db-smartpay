@@ -17,6 +17,7 @@ router = APIRouter()
     status_code=200,
 )
 async def get_all_users():
+    """Get all users"""
     users = await user_service.get_all()
     return users
 
@@ -28,6 +29,7 @@ async def get_all_users():
     status_code=201,
 )
 async def create_user(new_user: UserCreate):
+    """Create a new user"""
     user = await user_service.create(obj_in=new_user)
     return user
 
@@ -39,6 +41,7 @@ async def create_user(new_user: UserCreate):
     status_code=200,
 )
 async def get_user_by_id(user_id: UUID = Path(...)):
+    """Get a user by ID"""
     user = await user_service.get_by_id(id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -51,6 +54,7 @@ async def get_user_by_id(user_id: UUID = Path(...)):
     status_code=204,
 )
 async def update_user(update_user: UserUpdate, user_id: UUID = Path(...)):
+    """Update a user"""
     await user_service.update(id=user_id, obj_in=update_user)
 
 
@@ -60,6 +64,7 @@ async def update_user(update_user: UserUpdate, user_id: UUID = Path(...)):
     status_code=204,
 )
 async def delete_user(user_id: UUID = Path(...)):
+    """Delete a user"""
     deleted = await user_service.delete(id=user_id)
     if deleted == 0:
         raise HTTPException(status_code=404, detail="User not found")

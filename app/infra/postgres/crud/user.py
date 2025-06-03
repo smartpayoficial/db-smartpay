@@ -4,10 +4,7 @@ from app.schemas.user import UserCreate, UserUpdate
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
-    ...
-    """
-    Basic CRUD of the User model, inherits crud base methods
-    """
+    pass
 
 
 crud_user = CRUDUser(model=User)

@@ -41,9 +41,9 @@ services:
       - smartpay
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      interval: 10s
+      timeout: 10s
+      retries: 10
 
 volumes:
   smartpay-db:

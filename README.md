@@ -46,12 +46,12 @@ docker network create smartpay
 
 En Ubuntu:
 ```bash
-sudo docker-compose -f docker/Docker-compose.dev.yml up -d --build
+sudo docker-compose -f docker/Docker-compose.dev.yml up -f --build
 ```
 
 En Windows (Con permisos de administrador):
 ```bash
-docker-compose -f docker/Docker-compose.dev.yml up -d --build
+docker-compose -f docker/Docker-compose.dev.yml up -f --build
 ```
 
 La API quedará ejecutándose en el puerto 8002 por defecto y lista para recibir peticiones.
@@ -62,19 +62,6 @@ La API quedará ejecutándose en el puerto 8002 por defecto y lista para recibir
 - Documentación interactiva (Swagger): http://localhost:8002/docs
 - Documentación alternativa (ReDoc): http://localhost:8002/redoc
 
-### Variables de Entorno 🔑
-
-El servicio requiere las siguientes variables de entorno:
-
-```env
-DEBUGGER=False
-WEB_APP_VERSION=0.1.0
-WEP_APP_TITLE=smartpay-db
-WEP_APP_DESCRIPTION=Database service for SmartPay
-ENVIRONMENT=dev
-POSTGRES_DATABASE_URL=postgres://postgres:postgres@smartpay-db:5432/smartpay_dev_db
-DEFAULT_DATA=False
-```
 
 ## Construido con 🛠️
 

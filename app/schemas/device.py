@@ -2,16 +2,22 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from app.infra.postgres.models.device import DeviceState
+
 
 class DeviceBase(BaseModel):
     name: str
-    description: str
-    type: str
-    status: str
+    imei: str
+    imei_two: str
+    serial_number: str
+    model: str
+    brand: str
+    product_name: str
+    state: DeviceState = DeviceState.ACTIVE
 
 
 class DeviceCreate(DeviceBase):
-    pass
+    enrolment_id: UUID
 
 
 class DeviceUpdate(DeviceBase):
@@ -20,6 +26,7 @@ class DeviceUpdate(DeviceBase):
 
 class DeviceDB(DeviceBase):
     device_id: UUID
+    enrolment_id: UUID
 
     class Config:
         orm_mode = True

@@ -8,6 +8,7 @@ ENV PYTHONUNBUFFERED 1
 RUN pip install pipenv==v2021.5.29 --no-cache-dir
 COPY Pipfile* ./
 RUN pipenv install --dev --system
+RUN pip install email-validator
 
 COPY . .
 EXPOSE 80

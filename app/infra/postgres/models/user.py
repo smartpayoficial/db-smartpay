@@ -22,6 +22,8 @@ class User(Model):
     phone = fields.CharField(max_length=15)
     address = fields.CharField(max_length=255)
     state = fields.CharEnumField(UserState, default=UserState.ACTIVE)
+    created_at = fields.DatetimeField(auto_now_add=True)
+    updated_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
         table = "user"

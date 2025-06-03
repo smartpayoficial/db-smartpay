@@ -1,5 +1,21 @@
 from app.infra.postgres.models.authentication import Authentication
+from app.infra.postgres.models.city import City
 from app.infra.postgres.models.configuration import Configuration
+from app.infra.postgres.models.country import Country
 from app.infra.postgres.models.device import Device
+from app.infra.postgres.models.enrolment import Enrolment
+from app.infra.postgres.models.region import Region
+from app.infra.postgres.models.role import Role
+from app.infra.postgres.models.user import User
 
-__all__ = ["Configuration", "Authentication", "Device"]
+__all__ = [
+    "Authentication",
+    "City",
+    "Configuration",
+    "Country",
+    "Device",
+    "Enrolment",
+    "Region",
+    "Role",
+    "User",
+]

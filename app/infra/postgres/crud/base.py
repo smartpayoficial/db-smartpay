@@ -28,9 +28,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
 
     async def create(self, *, obj_in: CreateSchemaType) -> Dict[str, Any]:
         obj_in_data = obj_in.dict()
-        model = self.model(**obj_in_data)
-        await model.save()
-        return await model.values()
+        # Create a new record in the database
+        model = await self.model.create(**obj_in_data)
+
+        # Retrieve the freshly created object as a dict using values()
+        filter_kwargs = {self.pk_field: getattr(model, self.pk_field)}
+        result = await self.model.filter(**filter_kwargs).values()
+        # values() returns a list of dicts; we want the first (and only) item
+        return result[0] if result else {}
 
     async def update(self, *, _id: IdType, obj_in: UpdateSchemaType) -> bool:
         filter_kwargs = {self.pk_field: _id}
