@@ -46,12 +46,12 @@ docker network create smartpay
 
 En Ubuntu:
 ```bash
-sudo docker-compose -f docker/Docker-compose.dev.yml up -f --build
+sudo docker-compose -f docker/Docker-compose.dev.yml up --build
 ```
 
 En Windows (Con permisos de administrador):
 ```bash
-docker-compose -f docker/Docker-compose.dev.yml up -f --build
+docker-compose -f docker/Docker-compose.dev.yml up --build
 ```
 
 La API quedará ejecutándose en el puerto 8002 por defecto y lista para recibir peticiones.
