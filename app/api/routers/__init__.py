@@ -1,4 +1,3 @@
-from app.api.routers.authentication import router as authentication_router
 from app.api.routers.city import router as city_router
 from app.api.routers.configuration import router as configuration_router
 from app.api.routers.country import router as country_router
@@ -6,10 +5,10 @@ from app.api.routers.device import router as device_router
 from app.api.routers.enrolment import router as enrolment_router
 from app.api.routers.region import router as region_router
 from app.api.routers.role import router as role_router
+from app.api.routers.sim import router as sim_router
 from app.api.routers.user import router as user_router
 
 # Re-export the routers
-router = authentication_router
 city = city_router
 configuration = configuration_router
 country = country_router
@@ -17,10 +16,10 @@ device = device_router
 enrolment = enrolment_router
 region = region_router
 role = role_router
+sim = sim_router
 user = user_router
 
 __all__ = [
-    "router",
     "city",
     "configuration",
     "country",
@@ -28,5 +27,6 @@ __all__ = [
     "enrolment",
     "region",
     "role",
+    "sim",
     "user",
 ]

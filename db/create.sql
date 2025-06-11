@@ -4,6 +4,9 @@ CREATE DATABASE smartpay_test_db;
 -- Connect to the database
 \c smartpay_test_db;
 
+-- Enable pgcrypto extension for gen_random_uuid()
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
 -- Create enum types
 CREATE TYPE user_state AS ENUM ('Active', 'Inactive');
 CREATE TYPE device_state AS ENUM ('Active', 'Inactive');
@@ -92,3 +95,20 @@ CREATE TABLE IF NOT EXISTS "device" (
     product_name VARCHAR(40) NOT NULL,
     state device_state NOT NULL DEFAULT 'Active'
 );
+
+-- Create sim table
+CREATE TABLE IF NOT EXISTS "sim" (
+    sim_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    device_id UUID NOT NULL REFERENCES "device"(device_id),
+    icc_id VARCHAR(30) NOT NULL,
+    slot_index VARCHAR(10) NOT NULL,
+    operator VARCHAR(50) NOT NULL,
+    number VARCHAR(20) NOT NULL,
+    state VARCHAR(20) NOT NULL DEFAULT 'Active',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_sim_number UNIQUE (number),
+    CONSTRAINT uq_sim_icc_id UNIQUE (icc_id)
+);
+
+CREATE INDEX idx_sim_device_id ON "sim"(device_id);

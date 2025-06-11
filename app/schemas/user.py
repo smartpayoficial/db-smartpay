@@ -23,6 +23,9 @@ class UserBase(BaseModel):
     )
     phone: str
     address: str
+    username: str
+    password: str
+    role_id: UUID
     state: UserState = UserState.ACTIVE
 
 
