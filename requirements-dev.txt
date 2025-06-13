@@ -1,2 +1,3 @@
 pre-commit==3.7.0
 types-requests==2.31.0.20240106
+passlib[bcrypt]==1.7.4

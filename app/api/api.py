@@ -6,6 +6,7 @@ from app.api.routers import (
     country_router,
     device_router,
     enrolment_router,
+    internal_auth_router,
     region_router,
     role_router,
     sim_router,
@@ -33,3 +34,4 @@ api_router.include_router(region_router, prefix="/regions", tags=["regions"])
 api_router.include_router(role_router, prefix="/roles", tags=["roles"])
 api_router.include_router(sim_router, prefix="/sims", tags=["sims"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
+api_router.include_router(internal_auth_router)

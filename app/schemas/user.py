@@ -41,6 +41,8 @@ class UserDB(UserBase):
     user_id: UUID
     created_at: datetime
     updated_at: datetime
+    # Nunca serializar este campo
+    password: str = Field(..., exclude=True)
 
     class Config:
         orm_mode = True
