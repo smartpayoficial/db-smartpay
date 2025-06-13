@@ -91,7 +91,9 @@ async def seed():
                 "city_id": city_id,
                 "dni": "12345678",
                 "first_name": "Juan",
+                "middle_name": None,
                 "last_name": "Perez",
+                "second_last_name": None,
                 "email": "juan@example.com",
                 "prefix": "+51",
                 "phone": "999888777",
@@ -99,6 +101,7 @@ async def seed():
                 "username": "juan",
                 "password": "secret",
                 "role_id": role_customer_id,
+                "state": "Active",
             },
         )
         user_vendor = await _request(
@@ -109,7 +112,9 @@ async def seed():
                 "city_id": city_id,
                 "dni": "87654321",
                 "first_name": "Vendedor",
+                "middle_name": None,
                 "last_name": "Uno",
+                "second_last_name": None,
                 "email": "vendor@example.com",
                 "prefix": "+51",
                 "phone": "912345678",
@@ -117,6 +122,7 @@ async def seed():
                 "username": "vendor",
                 "password": "secret",
                 "role_id": role_vendor_id,
+                "state": "Active",
             },
         )
         user_id = user_customer and user_customer.get("user_id")
