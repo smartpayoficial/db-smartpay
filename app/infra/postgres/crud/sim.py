@@ -30,7 +30,7 @@ class CRUDSim(CRUDBase[Sim, SimCreate, SimUpdate]):
         db_obj = self.model(**obj_in_data)
         await db_obj.save()
         # Return the created object with all fields
-        return await self.model.filter(sim_id=db_obj.sim_id).values().first() or {}
+        return await self.model.get(sim_id=db_obj.sim_id)
 
     async def update(  # type: ignore[override]
         self,
