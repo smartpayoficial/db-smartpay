@@ -101,6 +101,7 @@ async def seed():
                 "username": "juan",
                 "password": "secret",
                 "role_id": role_customer_id,
+                # Only 'Active' or 'Inactive' are allowed for state
                 "state": "Active",
             },
         )
@@ -122,6 +123,7 @@ async def seed():
                 "username": "vendor",
                 "password": "secret",
                 "role_id": role_vendor_id,
+                # Only 'Active' or 'Inactive' are allowed for state
                 "state": "Active",
             },
         )
@@ -138,6 +140,10 @@ async def seed():
             "/enrolments",
             json={"user_id": user_id, "vendor_id": vendor_id},
         )
+        print("enrolment response:", enrolment)
+        if not enrolment or "enrolment_id" not in enrolment:
+            print("Error: enrolment no creado correctamente o falta enrolment_id")
+            return
         enrolment_id = enrolment["enrolment_id"]
 
         print("Seeding device…")
@@ -150,9 +156,18 @@ async def seed():
             "model": "Model X",
             "brand": "BrandY",
             "product_name": "ProductZ",
-            "state": "Active",
+            # Only 'Active' or 'Inactive' are allowed for state
+            "state": "Active",  # Changed to 'Active'
         }
+        print("device payload:", device_payload)
         device = await _request(client, "post", "/devices", json=device_payload)
+        print("device response:", device)
+        if not device or not isinstance(device, dict) or "device_id" not in device:
+            print(
+                "Error: device no creado correctamente o falta device_id. Respuesta:",
+                device,
+            )
+            return
         device_id = device["device_id"]
 
         print("Seeding sim…")
@@ -166,7 +181,8 @@ async def seed():
                 "slot_index": "0",
                 "operator": "Movistar",
                 "number": "+51987654321",
-                "state": "Active",
+                # Only 'Active' or 'Inactive' are allowed for state
+                "state": "Active",  # Changed to 'Active'
             },
         )
 

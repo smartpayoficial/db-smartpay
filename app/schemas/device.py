@@ -13,7 +13,9 @@ class DeviceBase(BaseModel):
     model: str
     brand: str
     product_name: str
-    state: DeviceState = DeviceState.ACTIVE
+    state: DeviceState = (
+        DeviceState.ACTIVE
+    )  # Only 'Active' or 'Inactive' allowed (enforced by DeviceState enum)
 
 
 class DeviceCreate(DeviceBase):
