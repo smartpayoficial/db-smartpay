@@ -175,6 +175,8 @@ async def seed():
                 "address": "Avenida Admin 2",
                 "username": "admin",
                 "password": "secret",
+                "role_id": role_customer_id,
+                # Only 'Active' or 'Inactive' are allowed for state
                 "role_id": role_admin_id,
                 "state": "Active",
             },
@@ -197,6 +199,7 @@ async def seed():
                 "username": "vendedor",
                 "password": "secret",
                 "role_id": role_vendor_id,
+                # Only 'Active' or 'Inactive' are allowed for state
                 "state": "Active",
             },
         )
@@ -238,6 +241,10 @@ async def seed():
             "/enrolments",
             json={"user_id": customer_id, "vendor_id": vendor_id},
         )
+        print("enrolment response:", enrolment)
+        if not enrolment or "enrolment_id" not in enrolment:
+            print("Error: enrolment no creado correctamente o falta enrolment_id")
+            return
         if not enrolment:
             print("No se pudo sembrar el enrolamiento, abortando device/sim seed.")
             return
@@ -249,13 +256,27 @@ async def seed():
             "name": "Dispositivo Prueba",
             "imei": "358240051111110",
             "imei_two": "358240051111111",
+            "serial_number": "SN123456",
+            "model": "Model X",
+            "brand": "BrandY",
+            "product_name": "ProductZ",
+            # Only 'Active' or 'Inactive' are allowed for state
+            "state": "Active",  # Changed to 'Active'
             "serial_number": "SNTEST123",
             "model": "ModeloXYZ",
             "brand": "MarcaABC",
             "product_name": "ProductoDEF",
             "state": "Active",
         }
+        print("device payload:", device_payload)
         device = await _request(client, "post", "/devices", json=device_payload)
+        print("device response:", device)
+        if not device or not isinstance(device, dict) or "device_id" not in device:
+            print(
+                "Error: device no creado correctamente o falta device_id. Respuesta:",
+                device,
+            )
+            return
         if not device:
             print("No se pudo sembrar el dispositivo, abortando sim seed.")
             return
@@ -272,7 +293,8 @@ async def seed():
                 "slot_index": "0",
                 "operator": "Claro",
                 "number": "+51987654321",
-                "state": "Active",
+                # Only 'Active' or 'Inactive' are allowed for state
+                "state": "Active",  # Changed to 'Active'
             },
         )
 
