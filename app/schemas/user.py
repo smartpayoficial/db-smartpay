@@ -6,6 +6,8 @@ from pydantic import BaseModel, EmailStr, Field
 
 from app.infra.postgres.models.user import UserState
 
+from app.schemas.role import RoleOut
+
 
 class UserBase(BaseModel):
     city_id: UUID
@@ -43,6 +45,8 @@ class UserDB(UserBase):
     updated_at: datetime
     # Nunca serializar este campo
     password: str = Field(..., exclude=True)
+
+    role: Optional[RoleOut] = None
 
     class Config:
         orm_mode = True

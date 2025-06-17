@@ -21,3 +21,11 @@ class RoleDB(RoleBase):
 
     class Config:
         orm_mode = True
+
+
+# --- NUEVO: Esquema para la salida de roles ---
+class RoleOut(RoleBase):
+    role_id: UUID
+
+    class Config:
+        orm_mode = True
