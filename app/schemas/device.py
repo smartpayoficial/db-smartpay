@@ -22,7 +22,7 @@ class DeviceCreate(DeviceBase):
     enrolment_id: UUID
 
 
-class DeviceUpdate(DeviceBase):
+class DeviceUpdate(BaseModel):
     pass
 
 

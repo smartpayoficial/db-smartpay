@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -18,8 +19,9 @@ class RoleCreate(RoleBase):
     pass
 
 
-class RoleUpdate(RoleBase):
-    pass
+class RoleUpdate(BaseModel):
+    name: Optional[str] = None
+    state: Optional["RoleState"] = None
 
 
 class RoleDB(RoleBase):
@@ -38,8 +40,9 @@ class ConfigurationCreate(ConfigurationBase):
     pass
 
 
-class ConfigurationUpdate(ConfigurationBase):
-    pass
+class ConfigurationUpdate(BaseModel):
+    tenant_id: Optional[UUID] = None
+    company_name: Optional[str] = None
 
 
 class ConfigurationDB(ConfigurationBase):
@@ -61,8 +64,12 @@ class AuthenticationCreate(AuthenticationBase):
     pass
 
 
-class AuthenticationUpdate(AuthenticationBase):
-    pass
+class AuthenticationUpdate(BaseModel):
+    user_id: Optional[UUID] = None
+    role_id: Optional[UUID] = None
+    configuration_id: Optional[UUID] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
 
 
 class AuthenticationDB(AuthenticationBase):

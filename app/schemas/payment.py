@@ -1,6 +1,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -27,8 +28,13 @@ class PlanCreate(PlanBase):
     pass
 
 
-class PlanUpdate(PlanBase):
-    pass
+class PlanUpdate(BaseModel):
+    user_id: Optional[UUID] = None
+    vendor_id: Optional[UUID] = None
+    device_id: Optional[UUID] = None
+    initial_date: Optional[date] = None
+    quotas: Optional[int] = None
+    contract: Optional[str] = None
 
 
 class PlanDB(PlanBase):
@@ -52,8 +58,14 @@ class PaymentCreate(PaymentBase):
     pass
 
 
-class PaymentUpdate(PaymentBase):
-    pass
+class PaymentUpdate(BaseModel):
+    device_id: Optional[UUID] = None
+    plan_id: Optional[UUID] = None
+    value: Optional[Decimal] = None
+    method: Optional[str] = None
+    state: Optional[PaymentState] = None
+    date: Optional[datetime] = None
+    reference: Optional[str] = None
 
 
 class PaymentDB(PaymentBase):

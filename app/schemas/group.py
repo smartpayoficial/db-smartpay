@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -18,8 +19,9 @@ class GroupCreate(GroupBase):
     pass
 
 
-class GroupUpdate(GroupBase):
-    pass
+class GroupUpdate(BaseModel):
+    name: Optional[str] = None
+    state: Optional[GroupState] = None
 
 
 class GroupDB(GroupBase):
@@ -38,8 +40,9 @@ class DeviceGroupCreate(DeviceGroupBase):
     pass
 
 
-class DeviceGroupUpdate(DeviceGroupBase):
-    pass
+class DeviceGroupUpdate(BaseModel):
+    device_id: Optional[UUID] = None
+    group_id: Optional[UUID] = None
 
 
 class DeviceGroupDB(DeviceGroupBase):

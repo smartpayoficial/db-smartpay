@@ -12,7 +12,11 @@ class CountryCreate(CountryBase):
     pass
 
 
-class CountryUpdate(CountryBase):
+class CountryUpdate(BaseModel):
+    # Ajusta los campos según CountryBase, todos opcionales y None por defecto
+    # Ejemplo:
+    # name: Optional[str] = None
+    # code: Optional[str] = None
     pass
 
 

@@ -12,7 +12,8 @@ class RegionCreate(RegionBase):
     pass
 
 
-class RegionUpdate(RegionBase):
+class RegionUpdate(BaseModel):
+    # Ajusta los campos según RegionBase, todos opcionales y None por defecto
     pass
 
 

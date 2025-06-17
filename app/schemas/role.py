@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -12,8 +13,9 @@ class RoleCreate(RoleBase):
     pass
 
 
-class RoleUpdate(RoleBase):
-    pass
+class RoleUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
 
 
 class RoleDB(RoleBase):
