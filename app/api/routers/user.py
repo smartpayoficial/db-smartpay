@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse, Response
 from passlib.context import CryptContext
 
 from app.schemas.user import UserCreate, UserDB, UserUpdate
+from app.schemas.user_out import RoleOut, UserOut
 from app.services.user import user_service
 
 router = APIRouter()
@@ -17,13 +18,49 @@ pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @router.get(
     "",
     response_class=JSONResponse,
-    response_model=List[UserDB],
+    response_model=List[UserOut],
     status_code=200,
 )
 async def get_all_users():
-    """Get all users"""
+    """Get all users with resolved role"""
+
     users = await user_service.get_all()
-    return users
+    user_out_list = []
+    for user in users:
+        role_out = (
+            RoleOut(
+                role_id=str(user["role__role_id"]),
+                name=user["role__name"],
+                description=user["role__description"],
+            )
+            if user.get("role__role_id")
+            else None
+        )
+        city_dict = None  # Si necesitas resolver city, aquí puedes hacerlo
+        user_out = UserOut(
+            user_id=str(user["user_id"]),
+            city=city_dict,
+            dni=user["dni"],
+            first_name=user["first_name"],
+            middle_name=user.get("middle_name"),
+            last_name=user["last_name"],
+            second_last_name=user.get("second_last_name"),
+            email=user["email"],
+            prefix=user["prefix"],
+            phone=user["phone"],
+            address=user["address"],
+            username=user["username"],
+            state=user["state"],
+            created_at=(
+                user["created_at"].isoformat() if user.get("created_at") else None
+            ),
+            updated_at=(
+                user["updated_at"].isoformat() if user.get("updated_at") else None
+            ),
+            role=role_out,
+        )
+        user_out_list.append(user_out)
+    return user_out_list
 
 
 @router.post(
