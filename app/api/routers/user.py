@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Path
 from fastapi.responses import JSONResponse, Response
 from passlib.context import CryptContext
 
-from app.schemas.user import UserCreate, UserDB, UserUpdate
+from app.schemas.user import UserCreate, UserUpdate
 from app.schemas.user_out import RoleOut, UserOut
 from app.services.user import user_service
 
@@ -66,7 +66,7 @@ async def get_all_users():
 @router.post(
     "",
     response_class=JSONResponse,
-    response_model=UserDB,
+    response_model=UserOut,
     status_code=201,
 )
 async def create_user(new_user: UserCreate):
@@ -74,13 +74,63 @@ async def create_user(new_user: UserCreate):
     data = new_user.dict()
     data["password"] = pwd_ctx.hash(new_user.password)
     user = await user_service.create(obj_in=UserCreate(**data))
-    return user
+    user_out = UserOut(
+        user_id=str(user["user_id"]) if isinstance(user, dict) else str(user.user_id),
+        city=None,  # Ajusta si tienes info de city
+        dni=user["dni"] if isinstance(user, dict) else user.dni,
+        first_name=user["first_name"] if isinstance(user, dict) else user.first_name,
+        middle_name=(
+            user.get("middle_name")
+            if isinstance(user, dict)
+            else getattr(user, "middle_name", None)
+        ),
+        last_name=user["last_name"] if isinstance(user, dict) else user.last_name,
+        second_last_name=(
+            user.get("second_last_name")
+            if isinstance(user, dict)
+            else getattr(user, "second_last_name", None)
+        ),
+        email=user["email"] if isinstance(user, dict) else user.email,
+        prefix=user["prefix"] if isinstance(user, dict) else user.prefix,
+        phone=user["phone"] if isinstance(user, dict) else user.phone,
+        address=user["address"] if isinstance(user, dict) else user.address,
+        username=user["username"] if isinstance(user, dict) else user.username,
+        state=str(user["state"]) if isinstance(user, dict) else str(user.state),
+        created_at=(
+            (user["created_at"].isoformat() if user.get("created_at") else None)
+            if isinstance(user, dict)
+            else (
+                user.created_at.isoformat()
+                if getattr(user, "created_at", None)
+                else None
+            )
+        ),
+        updated_at=(
+            (user["updated_at"].isoformat() if user.get("updated_at") else None)
+            if isinstance(user, dict)
+            else (
+                user.updated_at.isoformat()
+                if getattr(user, "updated_at", None)
+                else None
+            )
+        ),
+        role=(
+            RoleOut(
+                role_id=str(user["role__role_id"]),
+                name=user["role__name"],
+                description=user["role__description"],
+            )
+            if (isinstance(user, dict) and user.get("role__role_id"))
+            else None
+        ),
+    )
+    return user_out
 
 
 @router.get(
     "/{user_id}",
     response_class=JSONResponse,
-    response_model=UserDB,
+    response_model=UserOut,
     status_code=200,
 )
 async def get_user_by_id(user_id: UUID = Path(...)):
@@ -88,7 +138,57 @@ async def get_user_by_id(user_id: UUID = Path(...)):
     user = await user_service.get_by_id(id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
-    return user
+    user_out = UserOut(
+        user_id=str(user["user_id"]) if isinstance(user, dict) else str(user.user_id),
+        city=None,  # Ajusta si tienes info de city
+        dni=user["dni"] if isinstance(user, dict) else user.dni,
+        first_name=user["first_name"] if isinstance(user, dict) else user.first_name,
+        middle_name=(
+            user.get("middle_name")
+            if isinstance(user, dict)
+            else getattr(user, "middle_name", None)
+        ),
+        last_name=user["last_name"] if isinstance(user, dict) else user.last_name,
+        second_last_name=(
+            user.get("second_last_name")
+            if isinstance(user, dict)
+            else getattr(user, "second_last_name", None)
+        ),
+        email=user["email"] if isinstance(user, dict) else user.email,
+        prefix=user["prefix"] if isinstance(user, dict) else user.prefix,
+        phone=user["phone"] if isinstance(user, dict) else user.phone,
+        address=user["address"] if isinstance(user, dict) else user.address,
+        username=user["username"] if isinstance(user, dict) else user.username,
+        state=str(user["state"]) if isinstance(user, dict) else str(user.state),
+        created_at=(
+            (user["created_at"].isoformat() if user.get("created_at") else None)
+            if isinstance(user, dict)
+            else (
+                user.created_at.isoformat()
+                if getattr(user, "created_at", None)
+                else None
+            )
+        ),
+        updated_at=(
+            (user["updated_at"].isoformat() if user.get("updated_at") else None)
+            if isinstance(user, dict)
+            else (
+                user.updated_at.isoformat()
+                if getattr(user, "updated_at", None)
+                else None
+            )
+        ),
+        role=(
+            RoleOut(
+                role_id=str(user["role__role_id"]),
+                name=user["role__name"],
+                description=user["role__description"],
+            )
+            if (isinstance(user, dict) and user.get("role__role_id"))
+            else None
+        ),
+    )
+    return user_out
 
 
 @router.patch(
