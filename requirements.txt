@@ -1,0 +1,6 @@
+httpx
+fastapi
+tortoise-orm
+passlib[bcrypt]
+pydantic
+python-dotenv

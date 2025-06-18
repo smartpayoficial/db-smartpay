@@ -4,6 +4,8 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Path
 from fastapi.responses import JSONResponse, Response
 from passlib.context import CryptContext
+import logging
+logger = logging.getLogger("uvicorn.error")
 
 from app.schemas.user import UserCreate, UserUpdate
 from app.schemas.user_out import RoleOut, UserOut
@@ -34,9 +36,13 @@ async def get_all_users():
                 description=user["role__description"],
             )
             if user.get("role__role_id")
-            else None
+            else (_ for _ in ()).throw(HTTPException(status_code=500, detail="El usuario no tiene un rol asociado correctamente en la base de datos."))
         )
-        city_dict = None  # Si necesitas resolver city, aquí puedes hacerlo
+        logger.info(f"[DEBUG] user_id={user['user_id']} city__city_id={user.get('city__city_id')} city__name={user.get('city__name')}")
+        city_dict = (
+            {"city_id": str(user["city__city_id"]), "name": user["city__name"]}
+            if user.get("city__city_id") and user.get("city__name") else None
+        )
         user_out = UserOut(
             user_id=str(user["user_id"]),
             city=city_dict,
@@ -51,12 +57,8 @@ async def get_all_users():
             address=user["address"],
             username=user["username"],
             state=user["state"],
-            created_at=(
-                user["created_at"].isoformat() if user.get("created_at") else None
-            ),
-            updated_at=(
-                user["updated_at"].isoformat() if user.get("updated_at") else None
-            ),
+            created_at=(user["created_at"].isoformat() if user.get("created_at") else None),
+            updated_at=(user["updated_at"].isoformat() if user.get("updated_at") else None),
             role=role_out,
         )
         user_out_list.append(user_out)
@@ -74,9 +76,13 @@ async def create_user(new_user: UserCreate):
     data = new_user.dict()
     data["password"] = pwd_ctx.hash(new_user.password)
     user = await user_service.create(obj_in=UserCreate(**data))
+    city_value = (
+        {"city_id": str(user["city__city_id"]), "name": user["city__name"]}
+        if user.get("city__city_id") and user.get("city__name") else None
+    )
     user_out = UserOut(
         user_id=str(user["user_id"]) if isinstance(user, dict) else str(user.user_id),
-        city=None,  # Ajusta si tienes info de city
+        city=city_value,
         dni=user["dni"] if isinstance(user, dict) else user.dni,
         first_name=user["first_name"] if isinstance(user, dict) else user.first_name,
         middle_name=(
@@ -124,6 +130,7 @@ async def create_user(new_user: UserCreate):
             else None
         ),
     )
+    print(f"[DEBUG] user_id={user['user_id']} city__city_id={user.get('city__city_id')} city__name={user.get('city__name')}")
     return user_out
 
 
@@ -138,9 +145,14 @@ async def get_user_by_id(user_id: UUID = Path(...)):
     user = await user_service.get_by_id(id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
+    logger.info(f"[DEBUG] user_id={user['user_id']} city__city_id={user.get('city__city_id')} city__name={user.get('city__name')}")
+    city_value = (
+        {"city_id": str(user["city__city_id"]), "name": user["city__name"]}
+        if user.get("city__city_id") and user.get("city__name") else None
+    )
     user_out = UserOut(
         user_id=str(user["user_id"]) if isinstance(user, dict) else str(user.user_id),
-        city=None,  # Ajusta si tienes info de city
+        city=city_value, 
         dni=user["dni"] if isinstance(user, dict) else user.dni,
         first_name=user["first_name"] if isinstance(user, dict) else user.first_name,
         middle_name=(

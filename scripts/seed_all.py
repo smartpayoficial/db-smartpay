@@ -175,8 +175,6 @@ async def seed():
                 "address": "Avenida Admin 2",
                 "username": "admin",
                 "password": "secret",
-                "role_id": role_customer_id,
-                # Only 'Active' or 'Inactive' are allowed for state
                 "role_id": role_admin_id,
                 "state": "Active",
             },

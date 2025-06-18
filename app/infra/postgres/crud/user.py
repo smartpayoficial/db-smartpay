@@ -6,14 +6,15 @@ from app.schemas.user import UserCreate, UserUpdate
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
-    # Sobreescribir get_by_id para cargar la relación 'role' y devolver un dict
     async def get_by_id(self, *, _id: Any) -> Optional[dict]:
         result = (
             await self.model.filter(pk=_id)
-            .select_related("role")
+            .select_related("role", "city")
             .values(
                 "user_id",
                 "city_id",
+                "city__city_id",
+                "city__name",
                 "dni",
                 "first_name",
                 "middle_name",
@@ -33,9 +34,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
                 "role__description",
             )
         )
+        print("RESULTADO:", result)
         return result[0] if result else None
 
-    # Sobreescribir get_all para cargar la relación 'role' y devolver lista de dicts
+
     async def get_all(
         self,
         *,
@@ -45,12 +47,14 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     ) -> list[dict]:
         query = self.model.filter(**payload) if payload else self.model.all()
         return (
-            await query.select_related("role")
+            await query.select_related("role", "city")
             .offset(skip)
             .limit(limit)
             .values(
                 "user_id",
                 "city_id",
+                "city__city_id",
+                "city__name",
                 "dni",
                 "first_name",
                 "middle_name",
@@ -71,10 +75,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             )
         )
 
-    # Sobreescribir create para cargar la relación 'role' al devolver el objeto creado
     async def create(
         self, *, obj_in: UserCreate
-    ) -> User:  # El tipo de retorno ahora es una instancia de modelo User
+    ) -> User:  
         obj_in_data = obj_in.dict()
         model = await self.model.create(**obj_in_data)
         # Cargamos el objeto creado con la relación 'role'

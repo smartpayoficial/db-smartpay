@@ -11,7 +11,7 @@ services:
       - 8002:8002
       - 10001:10001
     environment:
-      - DEBUGGER=False
+      - DEBUGGER=True
       - WEB_APP_VERSION=0.1.0
       - WEP_APP_TITLE=smartpay-db
       - WEP_APP_DESCRIPTION=Database service for SmartPay
