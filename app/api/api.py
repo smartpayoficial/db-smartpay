@@ -9,6 +9,8 @@ from app.api.routers import (
     internal_auth_router,
     region_router,
     role_router,
+    payment_router,
+    plan_router,
     sim_router,
     user_router,
 )
@@ -32,6 +34,9 @@ api_router.include_router(device_router, prefix="/devices", tags=["devices"])
 api_router.include_router(enrolment_router, prefix="/enrolments", tags=["enrolments"])
 api_router.include_router(region_router, prefix="/regions", tags=["regions"])
 api_router.include_router(role_router, prefix="/roles", tags=["roles"])
+api_router.include_router(payment_router, prefix="/payments", tags=["payments"])
+api_router.include_router(plan_router, prefix="/plans", tags=["plans"])
 api_router.include_router(sim_router, prefix="/sims", tags=["sims"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
 api_router.include_router(internal_auth_router)
+

@@ -14,7 +14,7 @@ class EnrolmentCreate(EnrolmentBase):
 
 
 class EnrolmentUpdate(BaseModel):
-    # Ajusta los campos según EnrolmentBase, todos opcionales y None por defecto
+    
     pass
 
 

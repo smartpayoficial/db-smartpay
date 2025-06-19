@@ -205,15 +205,52 @@ async def get_user_by_id(user_id: UUID = Path(...)):
 
 @router.patch(
     "/{user_id}",
-    response_class=Response,
-    status_code=204,
+    response_class=JSONResponse,
+    response_model=UserOut,
+    status_code=200,
 )
 async def update_user(update_user: UserUpdate, user_id: UUID = Path(...)):
-    """Update a user. If password provided, hash it."""
+    """Update a user. If password provided, hash it. Only fields sent will be updated."""
     data = update_user.dict(exclude_unset=True)
     if "password" in data:
         data["password"] = pwd_ctx.hash(data["password"])
-    await user_service.update(id=user_id, obj_in=UserUpdate(**data))
+    updated = await user_service.update(id=user_id, obj_in=UserUpdate(**data))
+    if not updated:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Recupera y devuelve el usuario actualizado
+    user = await user_service.get_by_id(id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    # Adaptar los campos para el esquema UserOut
+    role_out = None
+    if user.get("role__role_id"):
+        role_out = RoleOut(
+            role_id=str(user["role__role_id"]),
+            name=user["role__name"],
+            description=user["role__description"]
+        )
+    city_dict = (
+        {"city_id": str(user["city__city_id"]), "name": user["city__name"]}
+        if user.get("city__city_id") and user.get("city__name") else None
+    )
+    return UserOut(
+        user_id=str(user["user_id"]),
+        city=city_dict,
+        dni=user["dni"],
+        first_name=user["first_name"],
+        middle_name=user.get("middle_name"),
+        last_name=user["last_name"],
+        second_last_name=user.get("second_last_name"),
+        email=user["email"],
+        prefix=user["prefix"],
+        phone=user["phone"],
+        address=user["address"],
+        username=user["username"],
+        state=str(user["state"]),
+        created_at=(user["created_at"].isoformat() if user.get("created_at") else None),
+        updated_at=(user["updated_at"].isoformat() if user.get("updated_at") else None),
+        role=role_out
+    )
 
 
 @router.delete(

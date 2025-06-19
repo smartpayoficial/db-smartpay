@@ -6,6 +6,8 @@ from app.api.routers.enrolment import router as enrolment_router
 from app.api.routers.internal_auth import router as internal_auth_router
 from app.api.routers.region import router as region_router
 from app.api.routers.role import router as role_router
+from app.api.routers.payment import router as payment_router
+from app.api.routers.plan import router as plan_router
 from app.api.routers.sim import router as sim_router
 from app.api.routers.user import router as user_router
 
@@ -18,6 +20,8 @@ enrolment = enrolment_router
 internal_auth = internal_auth_router
 region = region_router
 role = role_router
+payment = payment_router
+plan = plan_router
 sim = sim_router
 user = user_router
 
@@ -30,6 +34,8 @@ __all__ = [
     "internal_auth",
     "region",
     "role",
+    "payment",
+    "plan",
     "sim",
     "user",
 ]
