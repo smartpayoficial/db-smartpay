@@ -24,21 +24,25 @@ async def get_all_payments():
 
 @router.get("/{payment_id}", response_class=JSONResponse, response_model=PaymentDB, status_code=200)
 async def get_payment_by_id(payment_id: UUID = Path(...)):
-    payment = await crud_payment.get(id=payment_id)
+    payment = await crud_payment.get_by_id(_id=payment_id)
     if not payment:
         raise HTTPException(status_code=404, detail="Payment not found")
     return payment
 
 @router.patch("/{payment_id}", response_class=JSONResponse, response_model=PaymentDB, status_code=200)
 async def update_payment(payment_id: UUID, payment_update: PaymentUpdate):
-    updated = await crud_payment.update(id=payment_id, obj_in=payment_update)
+    updated = await crud_payment.update(_id=payment_id, obj_in=payment_update)
     if not updated:
         raise HTTPException(status_code=404, detail="Payment not found")
-    return updated
+    # Recupera el payment actualizado y adáptalo al esquema PaymentDB
+    payment = await crud_payment.get_by_id(_id=payment_id)
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found after update")
+    return payment
 
 @router.delete("/{payment_id}", status_code=204)
 async def delete_payment(payment_id: UUID = Path(...)):
-    deleted = await crud_payment.remove(id=payment_id)
+    deleted = await crud_payment.delete(_id=payment_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Payment not found")
     return None

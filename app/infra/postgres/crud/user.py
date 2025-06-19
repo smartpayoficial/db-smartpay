@@ -77,11 +77,34 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     async def create(
         self, *, obj_in: UserCreate
-    ) -> User:  
+    ) -> dict:
         obj_in_data = obj_in.dict()
         model = await self.model.create(**obj_in_data)
-        # Cargamos el objeto creado con la relación 'role'
-        return await self.model.filter(pk=model.pk).select_related("role").first()
+        # Cargamos el objeto creado con la relación 'role' y lo convertimos a dict
+        result = await self.model.filter(pk=model.pk).select_related("role").values(
+            "user_id",
+            "city_id",
+            "city__city_id",
+            "city__name",
+            "dni",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "second_last_name",
+            "email",
+            "prefix",
+            "phone",
+            "address",
+            "username",
+            "state",
+            "created_at",
+            "updated_at",
+            "role_id",
+            "role__role_id",
+            "role__name",
+            "role__description",
+        )
+        return result[0] if result else None
 
     async def get_by_username(self, username: str) -> Optional[User]:
         return await self.model.filter(username=username).select_related("role").first()

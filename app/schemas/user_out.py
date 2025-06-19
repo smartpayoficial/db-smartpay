@@ -25,4 +25,4 @@ class UserOut(BaseModel):
     state: str
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
-    role: RoleOut
+    role: Optional[RoleOut] = None
