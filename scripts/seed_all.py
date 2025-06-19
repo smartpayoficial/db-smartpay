@@ -14,9 +14,7 @@ from typing import Any, Dict, Optional
 
 import httpx
 
-# Asegúrate de que BASE_URL apunta a tu servicio DB_API (puerto 8002)
-# Si tu servicio DB_API está en un Docker Compose, puede que necesites usar el nombre del servicio,
-# por ejemplo: "http://db-api:8002" si tu servicio se llama 'db-api'
+
 BASE_URL = "http://localhost:8002"
 API_PREFIX = "/api/v1"
 
@@ -34,16 +32,11 @@ async def _request(
             print(f"    -> {method.upper()} {endpoint} {response.status_code} OK")
             return response.json()
 
-        # Duplicate / already exists handling (400 or 409) for POST
         if response.status_code in {400, 409} and method.lower() == "post":
-            # Attempt to get existing record
-            # --- CORRECCIÓN AQUÍ ---
             list_resp = await client.get(
                 f"{BASE_URL}{API_PREFIX}{endpoint}", timeout=10.0
             )
-            # --- FIN DE CORRECCIÓN ---
             if list_resp.status_code == 200 and list_resp.json():
-                # For simplicity, assume the first item matches for existing
                 print(
                     f"    -> {method.upper()} {endpoint} {response.status_code}: Already exists. Using first record."
                 )
@@ -295,6 +288,39 @@ async def seed():
                 "state": "Active",  # Changed to 'Active'
             },
         )
+
+        # --- Payment (usando el device creado y un plan ficticio) ---
+
+        plan_id = None
+        plans = await _request(client, "get", "/plans")
+        if plans and isinstance(plans, list) and len(plans) > 0:
+            plan_id = plans[0]["plan_id"]
+        else:
+            # Crea un plan dummy si no existe
+            plan_payload = {
+                "user_id": customer_id,
+                "vendor_id": vendor_id,
+                "device_id": device_id,
+                "initial_date": "2025-01-01",
+                "quotas": 12,
+                "contract": "Contrato demo"
+            }
+            plan = await _request(client, "post", "/plans", json=plan_payload)
+            plan_id = plan["plan_id"] if plan else None
+        if plan_id:
+            payment_payload = {
+                "device_id": device_id,
+                "plan_id": plan_id,
+                "value": "100.00",
+                "method": "card",
+                "state": "Approved",
+                "date": "2025-01-01T12:00:00",
+                "reference": "PAYMENTREF001"
+            }
+            payment = await _request(client, "post", "/payments", json=payment_payload)
+            print("payment response:", payment)
+        else:
+            print("No se pudo crear un plan para asociar al pago, omitiendo payment seed.")
 
         # --- Configuración ---
         print("\nSeeding configuration…")

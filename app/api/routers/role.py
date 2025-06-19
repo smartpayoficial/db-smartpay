@@ -1,7 +1,7 @@
 from typing import List
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.role import RoleCreate, RoleDB, RoleUpdate
@@ -16,8 +16,11 @@ router = APIRouter()
     response_model=List[RoleDB],
     status_code=200,
 )
-async def get_all_roles():
-    roles = await role_service.get_all()
+async def get_all_roles(name: str = Query(None, description="Filtrar por nombre de rol")):
+    payload = {}
+    if name:
+        payload["name__icontains"] = name
+    roles = await role_service.get_all(payload=payload)
     return roles
 
 
