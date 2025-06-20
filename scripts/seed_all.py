@@ -289,38 +289,56 @@ async def seed():
             },
         )
 
-        # --- Payment (usando el device creado y un plan ficticio) ---
-
-        plan_id = None
-        plans = await _request(client, "get", "/plans")
-        if plans and isinstance(plans, list) and len(plans) > 0:
-            plan_id = plans[0]["plan_id"]
-        else:
-            # Crea un plan dummy si no existe
-            plan_payload = {
-                "user_id": customer_id,
-                "vendor_id": vendor_id,
-                "device_id": device_id,
-                "initial_date": "2025-01-01",
-                "quotas": 12,
-                "contract": "Contrato demo"
-            }
-            plan = await _request(client, "post", "/plans", json=plan_payload)
-            plan_id = plan["plan_id"] if plan else None
+        # --- Plan y Payments asociados ---
+        print("\nSeeding plan y payments asociados…")
+        # Crea un plan específico, independientemente de si existen otros
+        plan_payload = {
+            "user_id": customer_id,
+            "vendor_id": vendor_id,
+            "device_id": device_id,
+            "initial_date": "2025-01-01",
+            "quotas": 12,
+            "contract": "Contrato de seed demo"
+        }
+        plan = await _request(client, "post", "/plans", json=plan_payload)
+        plan_id = plan["plan_id"] if plan else None
         if plan_id:
-            payment_payload = {
-                "device_id": device_id,
-                "plan_id": plan_id,
-                "value": "100.00",
-                "method": "card",
-                "state": "Approved",
-                "date": "2025-01-01T12:00:00",
-                "reference": "PAYMENTREF001"
-            }
-            payment = await _request(client, "post", "/payments", json=payment_payload)
-            print("payment response:", payment)
+            payments_payload = [
+                {
+                    "device_id": device_id,
+                    "plan_id": plan_id,
+                    "value": "100.00",
+                    "method": "card",
+                    "state": "Approved",
+                    "date": "2025-01-01T12:00:00",
+                    "reference": "PAYMENTREF001"
+                },
+                {
+                    "device_id": device_id,
+                    "plan_id": plan_id,
+                    "value": "150.00",
+                    "method": "cash",
+                    "state": "Pending",
+                    "date": "2025-02-01T12:00:00",
+                    "reference": "PAYMENTREF002"
+                },
+                {
+                    "device_id": device_id,
+                    "plan_id": plan_id,
+                    "value": "200.00",
+                    "method": "transfer",
+                    "state": "Approved",
+                    "date": "2025-03-01T12:00:00",
+                    "reference": "PAYMENTREF003"
+                }
+            ]
+            payments = []
+            for payment_payload in payments_payload:
+                payment = await _request(client, "post", "/payments", json=payment_payload)
+                payments.append(payment)
+            print("Pagos asociados creados:", payments)
         else:
-            print("No se pudo crear un plan para asociar al pago, omitiendo payment seed.")
+            print("No se pudo crear el plan para asociar los pagos, omitiendo payments seed.")
 
         # --- Configuración ---
         print("\nSeeding configuration…")

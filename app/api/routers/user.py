@@ -17,16 +17,26 @@ router = APIRouter()
 pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
+from fastapi import Query
+
 @router.get(
     "",
     response_class=JSONResponse,
     response_model=List[UserOut],
     status_code=200,
 )
-async def get_all_users():
-    """Get all users with resolved role"""
+async def get_all_users(
+    role_name: str = Query(None, description="Filtrar por nombre de rol"),
+    state: str = Query(None, description="Filtrar por estado del usuario (Active/Inactive)")
+):
+    """Get all users with resolved role. Permite filtrar por role_name y state."""
 
-    users = await user_service.get_all()
+    filter_payload = {}
+    if role_name:
+        filter_payload["role__name__iexact"] = role_name
+    if state:
+        filter_payload["state__iexact"] = state
+    users = await user_service.get_all(payload=filter_payload)
     user_out_list = []
     for user in users:
         role_out = (
