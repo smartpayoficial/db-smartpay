@@ -10,6 +10,7 @@ from app.api.routers.payment import router as payment_router
 from app.api.routers.plan import router as plan_router
 from app.api.routers.sim import router as sim_router
 from app.api.routers.user import router as user_router
+from app.api.routers.action import router as action_router
 
 # Re-export the routers
 city = city_router
@@ -24,6 +25,7 @@ payment = payment_router
 plan = plan_router
 sim = sim_router
 user = user_router
+action = action_router
 
 __all__ = [
     "city",
@@ -38,4 +40,5 @@ __all__ = [
     "plan",
     "sim",
     "user",
+    "action",
 ]

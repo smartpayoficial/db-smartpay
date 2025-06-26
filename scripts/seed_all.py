@@ -359,6 +359,21 @@ async def seed():
             },
         )
 
+        # --- Actions ---
+        print("\nSeeding actions…")
+        await _request(
+            client,
+            "post",
+            "/actions",
+            json={
+                "device_id": str(device_id),
+                "applied_by_id": str(vendor_id),
+                "state": "pending",
+                "action": "block",
+                "description": "Acción de bloqueo de dispositivo de prueba"
+            },
+        )
+
         print("\n✔ Base de datos poblada exitosamente.")
 
 

@@ -8,6 +8,7 @@ from app.infra.postgres.models.role import Role
 from app.infra.postgres.models.sim import Sim
 from app.infra.postgres.models.user import User
 from app.infra.postgres.models.payment import Plan, Payment
+from app.infra.postgres.models.action import Action
 
 __all__ = [
     "City",
@@ -21,4 +22,5 @@ __all__ = [
     "User",
     "Plan",
     "Payment",
+    "Action",
 ]

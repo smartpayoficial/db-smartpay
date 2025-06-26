@@ -13,6 +13,7 @@ from app.api.routers import (
     plan_router,
     sim_router,
     user_router,
+    action_router,
 )
 
 api_router = APIRouter()
@@ -38,5 +39,6 @@ api_router.include_router(payment_router, prefix="/payments", tags=["payments"])
 api_router.include_router(plan_router, prefix="/plans", tags=["plans"])
 api_router.include_router(sim_router, prefix="/sims", tags=["sims"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
+api_router.include_router(action_router, prefix="/actions", tags=["actions"])
 api_router.include_router(internal_auth_router)
 
