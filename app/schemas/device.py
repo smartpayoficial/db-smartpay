@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from pydantic import BaseModel
+from app.schemas.enrolment import EnrolmentResponse
 
 from app.infra.postgres.models.device import DeviceState
 
@@ -29,6 +30,14 @@ class DeviceUpdate(BaseModel):
 class DeviceDB(DeviceBase):
     device_id: UUID
     enrolment_id: UUID
+
+    class Config:
+        orm_mode = True
+
+
+class DeviceResponse(DeviceBase):
+    device_id: UUID
+    enrolment: EnrolmentResponse
 
     class Config:
         orm_mode = True

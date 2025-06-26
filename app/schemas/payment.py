@@ -5,6 +5,8 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from app.schemas.device import DeviceResponse
+from app.schemas.user import UserDB
 
 
 class PaymentState(str, Enum):
@@ -44,6 +46,15 @@ class PlanDB(PlanBase):
         orm_mode = True
 
 
+class PlanResponse(PlanBase):
+    plan_id: UUID
+    user: UserDB
+    vendor: UserDB
+
+    class Config:
+        orm_mode = True
+
+
 class PaymentBase(BaseModel):
     device_id: UUID
     plan_id: UUID
@@ -70,6 +81,20 @@ class PaymentUpdate(BaseModel):
 
 class PaymentDB(PaymentBase):
     payment_id: UUID
+
+    class Config:
+        orm_mode = True
+
+
+class PaymentResponse(BaseModel):
+    payment_id: UUID
+    value: Decimal
+    method: str
+    state: PaymentState
+    date: datetime
+    reference: str
+    device: DeviceResponse
+    plan: PlanResponse
 
     class Config:
         orm_mode = True
