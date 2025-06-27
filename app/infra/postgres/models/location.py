@@ -28,3 +28,17 @@ class City(Model):
 
     class Meta:
         table = "city"
+
+
+class Location(Model):
+    location_id = fields.UUIDField(pk=True)
+    device = fields.ForeignKeyField("models.Device", related_name="locations")
+    latitude = fields.FloatField()
+    longitude = fields.FloatField()
+    created_at = fields.DatetimeField(auto_now_add=True)
+
+    class Meta:
+        table = "location"
+
+    def __str__(self):
+        return f"Location for device {self.device_id} at {self.created_at}"

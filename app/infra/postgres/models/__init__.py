@@ -3,6 +3,7 @@ from app.infra.postgres.models.configuration import Configuration
 from app.infra.postgres.models.country import Country
 from app.infra.postgres.models.device import Device
 from app.infra.postgres.models.enrolment import Enrolment
+from app.infra.postgres.models.location import Location
 from app.infra.postgres.models.region import Region
 from app.infra.postgres.models.role import Role
 from app.infra.postgres.models.sim import Sim
@@ -16,6 +17,7 @@ __all__ = [
     "Country",
     "Device",
     "Enrolment",
+    "Location",
     "Region",
     "Role",
     "Sim",

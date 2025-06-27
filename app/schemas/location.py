@@ -57,8 +57,34 @@ class CityUpdate(CityBase):
     pass
 
 
+from datetime import datetime
+from typing import Optional
+
 class CityDB(CityBase):
     city_id: UUID
+
+    class Config:
+        orm_mode = True
+
+
+class LocationBase(BaseModel):
+    device_id: UUID
+    latitude: float
+    longitude: float
+
+
+class LocationCreate(LocationBase):
+    pass
+
+
+class LocationUpdate(BaseModel):
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+
+
+class LocationDB(LocationBase):
+    location_id: UUID
+    created_at: datetime
 
     class Config:
         orm_mode = True

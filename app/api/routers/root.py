@@ -8,7 +8,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=HealtCheck,
     status_code=200,
