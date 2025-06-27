@@ -8,7 +8,7 @@ class Sim(Model):
     icc_id = fields.CharField(max_length=30, unique=True)
     slot_index = fields.CharField(max_length=10)
     operator = fields.CharField(max_length=50)
-    number = fields.CharField(max_length=20, unique=True)
+    number = fields.CharField(max_length=20)
     state = fields.CharField(max_length=20, default="Active")
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
