@@ -20,7 +20,7 @@ pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 from fastapi import Query
 
 @router.get(
-    "",
+    "/",  # Fix: Changed from "" to "/" to handle trailing slash
     response_class=JSONResponse,
     response_model=List[UserOut],
     status_code=200,
