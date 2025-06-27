@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",  # Fix: Changed from "" to "/" to handle trailing slash
     response_class=JSONResponse,
     response_model=List[EnrolmentDB],
     status_code=200,
@@ -23,7 +23,7 @@ async def get_all_enrolments():
 
 
 @router.post(
-    "",
+    "/", # Fix: Changed from "" to "/" to handle trailing slash
     response_class=JSONResponse,
     response_model=EnrolmentDB,
     status_code=201,
