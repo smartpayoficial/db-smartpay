@@ -4,7 +4,9 @@ from app.infra.postgres.models.action import Action
 from app.schemas.action import ActionCreate, ActionUpdate
 
 class ActionService:
-    async def get_all(self) -> List[Action]:
+    async def get_all(self, payload: Optional[dict] = None) -> List[Action]:
+        if payload:
+            return await Action.filter(**payload).all()
         return await Action.all()
 
     async def get_by_id(self, action_id: UUID) -> Optional[Action]:
