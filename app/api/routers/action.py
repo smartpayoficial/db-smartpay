@@ -1,16 +1,24 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from fastapi import APIRouter, HTTPException, Path
 from fastapi.responses import JSONResponse
 
 from app.schemas.action import ActionCreate, ActionUpdate, ActionResponse
 from app.services.action import action_service
+from app.infra.postgres.models.action import ActionState
 
 router = APIRouter()
 
 @router.get("", response_model=List[ActionResponse], response_class=JSONResponse)
-async def get_all_actions():
-    return await action_service.get_all()
+async def get_all_actions(
+    device_id: Optional[UUID] = None, state: Optional[ActionState] = None
+):
+    payload = {}
+    if device_id:
+        payload["device_id"] = device_id
+    if state:
+        payload["state"] = state
+    return await action_service.get_all(payload=payload)
 
 @router.post("", response_model=ActionResponse, response_class=JSONResponse, status_code=201)
 async def create_action(new_action: ActionCreate):
