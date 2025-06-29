@@ -53,7 +53,7 @@ async def get_factory_reset_by_id(factory_reset_protection_id: UUID = Path(...))
         raise HTTPException(
             status_code=404, detail="Factory reset protection not found"
         )
-    return FactoryResetProtectionResponse.from_orm(factoryReset)
+    return factoryReset
 
 
 @router.patch(
