@@ -56,6 +56,24 @@ async def get_factory_reset_by_id(factory_reset_protection_id: UUID = Path(...))
     return factoryReset
 
 
+@router.get(
+    "/accountId/{account_id}",
+    response_model=FactoryResetProtectionResponse,
+    response_class=JSONResponse,
+)
+async def get_factory_reset_by_account_id(account_id: str = Path(...)):
+    factoryReset = (
+        await factory_reset_protection_service.get_factory_reset_by_account_id(
+            id=account_id
+        )
+    )
+    if not factoryReset:
+        raise HTTPException(
+            status_code=404, detail="Factory reset protection not found"
+        )
+    return factoryReset
+
+
 @router.patch(
     "/{factory_reset_protection_id}",
     response_model=FactoryResetProtectionResponse,

@@ -11,9 +11,9 @@ class FactoryResetProtectionState(str, Enum):
 
 class FactoryResetProtection(Model):
     factory_reset_protection_id = fields.UUIDField(pk=True)
-    account_id = fields.CharField(max_length=40, unique=True)
+    account_id = fields.CharField(max_length=40, unique=True, index=True)
     name = fields.CharField(max_length=255)
-    email = fields.CharField(max_length=80)
+    email = fields.CharField(max_length=80, unique=True)
     state = fields.CharEnumField(
         FactoryResetProtectionState, default=FactoryResetProtectionState.ACTIVE
     )
