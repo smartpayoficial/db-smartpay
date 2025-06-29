@@ -5,6 +5,7 @@ from .configuration import router as configuration_router
 from .country import router as country_router
 from .device import router as device_router
 from .enrolment import router as enrolment_router
+from .factory_reset_protection import router as factory_reset_protection_router
 from .internal_auth import router as internal_auth_router
 from .location import router as location_router
 from .payment import router as payment_router
@@ -32,4 +33,5 @@ __all__ = [
     "root_router",
     "sim_router",
     "user_router",
+    "factory_reset_protection_router",
 ]

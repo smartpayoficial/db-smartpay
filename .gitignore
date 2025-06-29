@@ -149,3 +149,5 @@ config/*
 # Additional changes from the code block
 *.swp
 .idea/
+requirements.txt
+requirements.txt

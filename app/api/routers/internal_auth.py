@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Header, HTTPException, status
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
@@ -21,7 +21,6 @@ def _internal_only(
 
 
 router = APIRouter(
-    dependencies=[Depends(_internal_only)],
     include_in_schema=False,  # ocultar en /docs públicas
 )
 
