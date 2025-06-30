@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[Sim],
     status_code=status.HTTP_200_OK,
@@ -39,7 +39,7 @@ async def get_sims_by_device(
     limit: int = Query(100, ge=1, le=1000, description="Number of records to return"),
 ):
     return await sim_service.get_by_device_id(
-        device_id=str(device_id), skip=skip, limit=limit
+        device_id=device_id, skip=skip, limit=limit
     )
 
 
@@ -52,7 +52,7 @@ async def get_sims_by_device(
     description="Retrieve a specific SIM card by its ID.",
 )
 async def get_sim(sim_id: UUID = Path(..., description="The ID of the SIM card")):
-    sim_card = await sim_service.get_by_id(sim_id=str(sim_id))
+    sim_card = await sim_service.get(id=sim_id)
     if not sim_card:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -82,7 +82,7 @@ async def get_sim_by_number(
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=Sim,
     status_code=status.HTTP_201_CREATED,
@@ -105,7 +105,14 @@ async def update_sim(
     sim_id: UUID = Path(..., description="The ID of the SIM card to update"),
     sim_card_in: SimUpdate = Body(...),
 ):
-    return await sim_service.update(sim_id=str(sim_id), obj_in=sim_card_in)
+    await sim_service.update(id=sim_id, obj_in=sim_card_in)
+    updated_sim = await sim_service.get(id=sim_id)
+    if not updated_sim:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"SIM card with ID {sim_id} not found after update.",
+        )
+    return updated_sim
 
 
 @router.delete(
@@ -118,5 +125,5 @@ async def update_sim(
 async def delete_sim(
     sim_id: UUID = Path(..., description="The ID of the SIM card to delete")
 ):
-    await sim_service.remove(sim_id=str(sim_id))
+    await sim_service.remove(id=sim_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
