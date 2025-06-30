@@ -48,6 +48,19 @@ async def get_location_by_id(location_id: UUID = Path(...)):
     return location
 
 
+@router.get(
+    "/device/{device_id}",
+    response_class=JSONResponse,
+    response_model=LocationDB,
+    status_code=200,
+)
+async def get_location_by_device_id(device_id: UUID = Path(...)):
+    location = await location_service.get_last_by_device_id(device_id=device_id)
+    if location is None:
+        raise HTTPException(status_code=404, detail="Location not found")
+    return location
+
+
 @router.patch(
     "/{location_id}",
     response_class=Response,

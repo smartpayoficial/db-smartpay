@@ -39,6 +39,14 @@ class CRUDLocation(CRUDBase[Location, LocationCreate, LocationUpdate]):
 
         return await query.offset(skip).limit(limit).values()
 
+    async def get_last_by_device_id(self, device_id: int) -> Optional[Location]:
+        location = (
+            await Location.filter(device_id=device_id).order_by("-created_at").first()
+        )
+        if location:
+            return location
+        return None
+
 
 country_crud = CRUDCountry(model=Country)
 region_crud = CRUDRegion(model=Region)

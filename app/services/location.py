@@ -1,9 +1,12 @@
+from typing import Optional
+
 from app.infra.postgres.crud.location import (
     city_crud,
     country_crud,
     location_crud,
     region_crud,
 )
+from app.infra.postgres.models.location import Location
 from app.services.base import BaseService
 
 
@@ -20,7 +23,8 @@ class CityService(BaseService):
 
 
 class LocationService(BaseService):
-    pass
+    async def get_last_by_device_id(self, device_id: int) -> Optional[Location]:
+        return await self._crud.get_last_by_device_id(device_id)
 
 
 country_service = CountryService(crud=country_crud)
