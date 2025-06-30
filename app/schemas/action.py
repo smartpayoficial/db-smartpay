@@ -1,13 +1,18 @@
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
+
+from pydantic import BaseModel
+
+from app.schemas.user import UserDB
+
 
 class ActionState(str, Enum):
     APPLIED = "applied"
     PENDING = "pending"
     FAILED = "failed"
+
 
 class ActionType(str, Enum):
     BLOCK = "block"
@@ -18,6 +23,7 @@ class ActionType(str, Enum):
     UN_BLOCK = "unblock"
     EXCEPTION = "exception"
 
+
 class ActionBase(BaseModel):
     device_id: UUID
     state: ActionState = ActionState.PENDING
@@ -25,12 +31,15 @@ class ActionBase(BaseModel):
     action: ActionType
     description: Optional[str] = None
 
+
 class ActionCreate(ActionBase):
     pass
+
 
 class ActionUpdate(BaseModel):
     state: Optional[ActionState] = None
     description: Optional[str] = None
+
 
 class ActionInDB(ActionBase):
     action_id: UUID
@@ -40,5 +49,16 @@ class ActionInDB(ActionBase):
     class Config:
         orm_mode = True
 
-class ActionResponse(ActionInDB):
-    pass
+
+class ActionResponse(BaseModel):
+    action_id: UUID
+    device_id: UUID
+    state: ActionState
+    action: ActionType
+    description: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    applied_by: UserDB
+
+    class Config:
+        orm_mode = True
