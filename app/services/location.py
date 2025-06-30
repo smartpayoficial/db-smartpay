@@ -24,7 +24,7 @@ class CityService(BaseService):
 
 class LocationService(BaseService):
     async def get_last_by_device_id(self, device_id: int) -> Optional[Location]:
-        return await self._crud.get_last_by_device_id(device_id)
+        return await self.crud.get_last_by_device_id(device_id)
 
 
 country_service = CountryService(crud=country_crud)

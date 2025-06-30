@@ -42,7 +42,7 @@ async def create_enrolment(new_enrolment: EnrolmentCreate):
 )
 async def get_enrolment_by_id(enrolment_id: UUID = Path(...)):
     """Get an enrolment by ID"""
-    enrolment = await enrolment_service.get_by_id(id=enrolment_id)
+    enrolment = await enrolment_service.get(id=enrolment_id)
     if enrolment is None:
         raise HTTPException(status_code=404, detail="Enrolment not found")
     return enrolment
