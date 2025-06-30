@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[CityDB],
     status_code=200,
@@ -22,7 +22,7 @@ async def get_all_cities():
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=CityDB,
     status_code=201,
@@ -39,7 +39,7 @@ async def create_city(new_city: CityCreate):
     status_code=200,
 )
 async def get_city_by_id(city_id: UUID = Path(...)):
-    city = await city_service.get_by_id(id=city_id)
+    city = await city_service.get(id=city_id)
     if city is None:
         raise HTTPException(status_code=404, detail="City not found")
     return city

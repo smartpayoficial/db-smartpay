@@ -17,7 +17,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def get_all(
         self, *, skip: int = 0, limit: int = 100, filters: Optional[Dict[str, Any]] = None
     ) -> List[ModelType]:
-        return await self.crud.get_all(skip=skip, limit=limit, filters=filters)
+        return await self.crud.get_all(skip=skip, limit=limit, filters=filters or {})
 
     async def get(self, id: Any) -> Optional[ModelType]:
         return await self.crud.get(id=id)
