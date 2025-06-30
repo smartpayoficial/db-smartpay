@@ -16,6 +16,14 @@ class CityUpdate(CityBase):
     pass
 
 
+class CityResponse(BaseModel):
+    city_id: UUID
+    name: str
+
+    class Config:
+        orm_mode = True
+
+
 class CityDB(CityBase):
     city_id: UUID
 

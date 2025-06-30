@@ -13,6 +13,15 @@ class RoleCreate(RoleBase):
     pass
 
 
+class RoleResponse(BaseModel):
+    role_id: UUID
+    name: str
+    description: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
 class RoleUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
