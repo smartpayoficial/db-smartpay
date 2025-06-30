@@ -42,7 +42,7 @@ async def create_location(new_location: LocationCreate):
     status_code=200,
 )
 async def get_location_by_id(location_id: UUID = Path(...)):
-    location = await location_service.get(id=location_id)
+    location = await location_service.get_by_id(id=location_id)
     if location is None:
         raise HTTPException(status_code=404, detail="Location not found")
     return location

@@ -43,7 +43,7 @@ async def create_authentication(new_authentication: AuthenticationCreate):
     status_code=200,
 )
 async def get_authentication_by_id(authentication_id: UUID = Path(...)):
-    authentication = await authentication_service.get(id=authentication_id)
+    authentication = await authentication_service.get_by_id(id=authentication_id)
     if authentication is None:
         raise HTTPException(status_code=404, detail="Authentication not found")
     return authentication

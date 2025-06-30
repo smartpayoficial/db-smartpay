@@ -34,7 +34,7 @@ async def create_action(new_action: ActionCreate):
 
 @router.get("/{action_id}", response_model=ActionResponse, response_class=JSONResponse)
 async def get_action_by_id(action_id: UUID = Path(...)):
-    action = await action_service.get(id=action_id)
+    action = await action_service.get_by_id(action_id)
     if not action:
         raise HTTPException(status_code=404, detail="Action not found")
     return action
