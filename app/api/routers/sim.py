@@ -52,7 +52,7 @@ async def get_sims_by_device(
     description="Retrieve a specific SIM card by its ID.",
 )
 async def get_sim(sim_id: UUID = Path(..., description="The ID of the SIM card")):
-    sim_card = await sim_service.get_by_id(sim_id=str(sim_id))
+    sim_card = await sim_service.get(id=str(sim_id))
     if not sim_card:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -43,7 +43,7 @@ async def create_device(new_device: DeviceCreate):
     status_code=200,
 )
 async def get_device_by_id(device_id: UUID = Path(...)):
-    device = await device_service.get_by_id(id=device_id)
+    device = await device_service.get(id=device_id)
     if device is None:
         raise HTTPException(status_code=404, detail="Device not found")
     return device

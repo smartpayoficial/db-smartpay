@@ -50,7 +50,7 @@ async def create_role(new_role: RoleCreate):
     status_code=200,
 )
 async def get_role_by_id(role_id: UUID = Path(...)):
-    role = await role_service.get_by_id(id=role_id)
+    role = await role_service.get(id=role_id)
     if role is None:
         raise HTTPException(status_code=404, detail="Role not found")
     return role
@@ -109,7 +109,7 @@ async def create_config(new_config: ConfigurationCreate):
     status_code=200,
 )
 async def get_config_by_id(config_id: UUID = Path(...)):
-    config = await config_service.get_by_id(id=config_id)
+    config = await config_service.get(id=config_id)
     if config is None:
         raise HTTPException(status_code=404, detail="Configuration not found")
     return config
@@ -170,7 +170,7 @@ async def create_auth(new_auth: AuthenticationCreate):
     status_code=200,
 )
 async def get_auth_by_id(auth_id: UUID = Path(...)):
-    auth = await auth_service.get_by_id(id=auth_id)
+    auth = await auth_service.get(id=auth_id)
     if auth is None:
         raise HTTPException(status_code=404, detail="Authentication not found")
     return auth

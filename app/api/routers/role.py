@@ -42,7 +42,7 @@ async def create_role(new_role: RoleCreate):
     status_code=200,
 )
 async def get_role_by_id(role_id: UUID = Path(...)):
-    role = await role_service.get_by_id(id=role_id)
+    role = await role_service.get(id=role_id)
     if role is None:
         raise HTTPException(status_code=404, detail="Role not found")
     return role

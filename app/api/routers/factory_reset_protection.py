@@ -46,7 +46,7 @@ async def create_factory_protection(new_factory_reset: FactoryResetProtectionCre
     response_class=JSONResponse,
 )
 async def get_factory_reset_by_id(factory_reset_protection_id: UUID = Path(...)):
-    factoryReset = await factory_reset_protection_service.get_by_id(
+    factoryReset = await factory_reset_protection_service.get(
         id=factory_reset_protection_id
     )
     if not factoryReset:
@@ -90,7 +90,7 @@ async def update_factory_reset_protection(
             status_code=404, detail="Factory reset protection not found"
         )
 
-    updated = await factory_reset_protection_service.get_by_id(
+    updated = await factory_reset_protection_service.get(
         id=factory_reset_protection_id
     )
 

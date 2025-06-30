@@ -43,7 +43,7 @@ async def create_configuration(new_configuration: ConfigurationCreate):
     status_code=200,
 )
 async def get_configuration_by_id(configuration_id: UUID = Path(...)):
-    configuration = await configuration_service.get_by_id(id=configuration_id)
+    configuration = await configuration_service.get(id=configuration_id)
     if configuration is None:
         raise HTTPException(status_code=404, detail="Configuration not found")
     return configuration
