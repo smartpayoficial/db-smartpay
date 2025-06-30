@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, Query, HTTPException, Path
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.device import DeviceCreate, DeviceDB, DeviceUpdate
@@ -17,8 +17,11 @@ router = APIRouter()
     response_model=List[DeviceDB],
     status_code=200,
 )
-async def get_all_devices():
-    devices = await device_service.get_all()
+async def get_all_devices(enrolment_id: Optional[str] = Query(None)):
+    filters = {}
+    if enrolment_id:
+        filters["enrolment_id"] = enrolment_id
+    devices = await device_service.get_all(filters=filters)
     return devices
 
 

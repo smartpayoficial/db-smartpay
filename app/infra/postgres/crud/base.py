@@ -15,16 +15,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
             if field.pk
         )
 
-    async def get_all(
-        self,
-        *,
-        payload: Dict[str, Any] = {},
-        skip: int = 0,
-        limit: int = 10,
-    ) -> List[Dict[str, Any]]:
-        query = self.model.filter(**payload) if payload else self.model
-        model = await query.all().offset(skip).limit(limit).values()
-        return model
+    async def get_all(self, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
+        return await self.model.all().offset(skip).limit(limit)
 
     async def create(self, *, obj_in: CreateSchemaType) -> Dict[str, Any]:
         obj_in_data = obj_in.dict()
