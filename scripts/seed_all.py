@@ -14,7 +14,6 @@ from typing import Any, Dict, Optional
 
 import httpx
 
-
 BASE_URL = "http://localhost:8002"
 API_PREFIX = "/api/v1"
 
@@ -79,7 +78,7 @@ async def seed():
         city = await _request(
             client,
             "post",
-            "/cities",
+            "/cities/",
             json={"name": "Lima", "region_id": region_id, "state": "Active"},
         )
         if not city:
@@ -247,17 +246,12 @@ async def seed():
             "name": "Dispositivo Prueba",
             "imei": "358240051111110",
             "imei_two": "358240051111111",
-            "serial_number": "SN123456",
-            "model": "Model X",
-            "brand": "BrandY",
-            "product_name": "ProductZ",
             # Only 'Active' or 'Inactive' are allowed for state
             "state": "Active",  # Changed to 'Active'
             "serial_number": "SNTEST123",
             "model": "ModeloXYZ",
             "brand": "MarcaABC",
             "product_name": "ProductoDEF",
-            "state": "Active",
         }
         print("device payload:", device_payload)
         device = await _request(client, "post", "/devices", json=device_payload)
@@ -298,7 +292,7 @@ async def seed():
             "device_id": device_id,
             "initial_date": "2025-01-01",
             "quotas": 12,
-            "contract": "Contrato de seed demo"
+            "contract": "Contrato de seed demo",
         }
         plan = await _request(client, "post", "/plans", json=plan_payload)
         plan_id = plan["plan_id"] if plan else None
@@ -311,7 +305,7 @@ async def seed():
                     "method": "card",
                     "state": "Approved",
                     "date": "2025-01-01T12:00:00",
-                    "reference": "PAYMENTREF001"
+                    "reference": "PAYMENTREF001",
                 },
                 {
                     "device_id": device_id,
@@ -320,7 +314,7 @@ async def seed():
                     "method": "cash",
                     "state": "Pending",
                     "date": "2025-02-01T12:00:00",
-                    "reference": "PAYMENTREF002"
+                    "reference": "PAYMENTREF002",
                 },
                 {
                     "device_id": device_id,
@@ -329,16 +323,20 @@ async def seed():
                     "method": "transfer",
                     "state": "Approved",
                     "date": "2025-03-01T12:00:00",
-                    "reference": "PAYMENTREF003"
-                }
+                    "reference": "PAYMENTREF003",
+                },
             ]
             payments = []
             for payment_payload in payments_payload:
-                payment = await _request(client, "post", "/payments", json=payment_payload)
+                payment = await _request(
+                    client, "post", "/payments", json=payment_payload
+                )
                 payments.append(payment)
             print("Pagos asociados creados:", payments)
         else:
-            print("No se pudo crear el plan para asociar los pagos, omitiendo payments seed.")
+            print(
+                "No se pudo crear el plan para asociar los pagos, omitiendo payments seed."
+            )
 
         # --- Configuración ---
         print("\nSeeding configuration…")
@@ -370,7 +368,7 @@ async def seed():
                 "applied_by_id": str(vendor_id),
                 "state": "pending",
                 "action": "block",
-                "description": "Acción de bloqueo de dispositivo de prueba"
+                "description": "Acción de bloqueo de dispositivo de prueba",
             },
         )
 
