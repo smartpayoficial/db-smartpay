@@ -27,7 +27,7 @@ async def get_all_factory_protections(
     if state:
         payload["state"] = state
 
-    return await factory_reset_protection_service.get_all(payload=payload)
+    return await factory_reset_protection_service.get_all(filters=payload)
 
 
 @router.post(

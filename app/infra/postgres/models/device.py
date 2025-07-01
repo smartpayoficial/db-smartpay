@@ -14,7 +14,7 @@ class Device(Model):
     enrolment = fields.OneToOneField("models.Enrolment", related_name="device")
     name = fields.CharField(max_length=80)
     imei = fields.CharField(max_length=15, unique=True)
-    imei_two = fields.CharField(max_length=15, unique=True)
+    imei_two = fields.CharField(max_length=15)
     serial_number = fields.CharField(max_length=20)
     model = fields.CharField(max_length=40)
     brand = fields.CharField(max_length=40)
