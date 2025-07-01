@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -24,7 +25,15 @@ class DeviceCreate(DeviceBase):
 
 
 class DeviceUpdate(BaseModel):
-    pass
+    name: Optional[str] = None
+    imei: Optional[str] = None
+    imei_two: Optional[str] = None
+    serial_number: Optional[str] = None
+    model: Optional[str] = None
+    brand: Optional[str] = None
+    product_name: Optional[str] = None
+    state: Optional[DeviceState] = None
+    enrolment_id: Optional[UUID] = None
 
 
 class DeviceDB(DeviceBase):

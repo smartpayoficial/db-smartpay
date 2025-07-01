@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
 
 from app.schemas.general import CreateSchemaType, ModelType, UpdateSchemaType
 
@@ -15,14 +15,12 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
             if field.pk
         )
 
-    async def get(self, *, id: IdType) -> Optional[ModelType]:
+    async def get(self, *, id: Any) -> Optional[ModelType]:
         """
         Retrieve a single record by its primary key.
         """
-        if id:
-            filter_kwargs = {self.pk_field: id}
-            return await self.model.filter(**filter_kwargs).first()
-        return None
+        pk = self.model._meta.pk_attr
+        return await self.model.get_or_none(**{pk: id})
 
     async def get_all(
         self, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = {}
@@ -35,22 +33,23 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         model = await self.model.create(**obj_in_data)
         return model
 
-    async def update(self, *, id: IdType, obj_in: UpdateSchemaType) -> bool:
-        filter_kwargs = {self.pk_field: id}
-        model = await self.model.get_or_none(**filter_kwargs)
-        if not model:
-            return False
+    async def update(self, *, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> bool:
+        pk = self.model._meta.pk_attr
+        update_data = (
+            obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_unset=True)
+        )
 
-        update_data = obj_in.dict(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(model, field, value)
+        if not update_data:
+            # If there's nothing to update, just check for existence.
+            return await self.model.filter(**{pk: id}).exists()
 
-        await model.save()
-        return True
+        updated_count = await self.model.filter(**{pk: id}).update(**update_data)
 
-    async def delete(self, *, id: IdType) -> int:
-        filter_kwargs = {self.pk_field: id}
-        deleted_count = await self.model.filter(**filter_kwargs).delete()
+        return updated_count > 0
+
+    async def delete(self, *, id: Any) -> int:
+        pk = self.model._meta.pk_attr
+        deleted_count = await self.model.filter(**{pk: id}).delete()
         return deleted_count
 
     async def count(self, *, payload: Dict[str, Any] = {}) -> int:

@@ -51,11 +51,17 @@ async def get_device_by_id(device_id: UUID = Path(...)):
 
 @router.patch(
     "/{device_id}",
-    response_class=Response,
-    status_code=204,
+    response_class=JSONResponse,
+    response_model=DeviceDB,
+    status_code=200,
 )
 async def update_device(update_device: DeviceUpdate, device_id: UUID = Path(...)):
-    await device_service.update(id=device_id, obj_in=update_device)
+    updated = await device_service.update(id=device_id, obj_in=update_device)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Device not found")
+    
+    device = await device_service.get(id=device_id)
+    return device
 
 
 @router.delete(
