@@ -20,7 +20,7 @@ async def get_all_roles(name: str = Query(None, description="Filtrar por nombre 
     payload = {}
     if name:
         payload["name__icontains"] = name
-    roles = await role_service.get_all(payload=payload)
+    roles = await role_service.get_all(filters=payload)
     return roles
 
 

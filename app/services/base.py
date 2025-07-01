@@ -49,4 +49,4 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return await self.crud.update(id=id, obj_in=obj_in)
 
     async def remove(self, *, id: Any) -> ModelType:
-        return await self.crud.remove(id=id)
+        return await self.crud.delete(id=id)
