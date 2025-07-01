@@ -1,7 +1,9 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+
 from app.schemas.user import UserDB
 
 
@@ -15,8 +17,8 @@ class EnrolmentCreate(EnrolmentBase):
 
 
 class EnrolmentUpdate(BaseModel):
-    
-    pass
+    user_id: Optional[UUID] = None
+    vendor_id: Optional[UUID] = None
 
 
 class EnrolmentDB(EnrolmentBase):

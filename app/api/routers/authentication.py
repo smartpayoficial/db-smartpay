@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[AuthenticationDB],
     status_code=200,
@@ -26,7 +26,7 @@ async def get_all_authentications():
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=AuthenticationDB,
     status_code=201,
@@ -37,7 +37,7 @@ async def create_authentication(new_authentication: AuthenticationCreate):
 
 
 @router.get(
-    "/{authentication_id}",
+    "/{authentication_id}/",
     response_class=JSONResponse,
     response_model=AuthenticationDB,
     status_code=200,
@@ -50,7 +50,7 @@ async def get_authentication_by_id(authentication_id: UUID = Path(...)):
 
 
 @router.patch(
-    "/{authentication_id}",
+    "/{authentication_id}/",
     response_class=Response,
     status_code=204,
 )
@@ -63,7 +63,7 @@ async def update_authentication(
 
 
 @router.delete(
-    "/{authentication_id}",
+    "/{authentication_id}/",
     response_class=Response,
     status_code=204,
 )

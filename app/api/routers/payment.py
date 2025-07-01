@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Query, HTTPException, Path
 from fastapi.responses import JSONResponse
 
-from app.schemas.payment import PaymentCreate, PaymentUpdate, PaymentResponse
+from app.schemas.plan import PaymentCreate, PaymentUpdate, PaymentResponse
 from app.infra.postgres.models.payment import Payment
 from app.infra.postgres.crud.payment import crud_payment
 

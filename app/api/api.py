@@ -30,7 +30,7 @@ api_router.include_router(action_router, prefix="/actions", tags=["actions"])
 api_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
 api_router.include_router(city_router, prefix="/cities", tags=["cities"])
 api_router.include_router(
-    configuration_router, prefix="/configurations", tags=["configurations"]
+    configuration_router, prefix="/configuration", tags=["configurations"]
 )
 api_router.include_router(country_router, prefix="/countries", tags=["countries"])
 api_router.include_router(device_router, prefix="/devices", tags=["devices"])

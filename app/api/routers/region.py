@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[RegionDB],
     status_code=200,
@@ -22,7 +22,7 @@ async def get_all_regions():
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=RegionDB,
     status_code=201,

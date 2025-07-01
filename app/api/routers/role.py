@@ -11,21 +11,21 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[RoleDB],
     status_code=200,
 )
 async def get_all_roles(name: str = Query(None, description="Filtrar por nombre de rol")):
-    payload = {}
+    filters = {}
     if name:
-        payload["name__icontains"] = name
-    roles = await role_service.get_all(payload=payload)
+        filters["name__icontains"] = name
+    roles = await role_service.get_all(filters=filters)
     return roles
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=RoleDB,
     status_code=201,
@@ -36,7 +36,7 @@ async def create_role(new_role: RoleCreate):
 
 
 @router.get(
-    "/{role_id}",
+    "/{role_id}/",
     response_class=JSONResponse,
     response_model=RoleDB,
     status_code=200,
@@ -49,7 +49,7 @@ async def get_role_by_id(role_id: UUID = Path(...)):
 
 
 @router.patch(
-    "/{role_id}",
+    "/{role_id}/",
     response_class=Response,
     status_code=204,
 )
@@ -58,7 +58,7 @@ async def update_role(update_role: RoleUpdate, role_id: UUID = Path(...)):
 
 
 @router.delete(
-    "/{role_id}",
+    "/{role_id}/",
     response_class=Response,
     status_code=204,
 )

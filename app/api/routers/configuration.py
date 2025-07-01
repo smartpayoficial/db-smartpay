@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[ConfigurationDB],
     status_code=200,
@@ -26,7 +26,7 @@ async def get_all_configurations():
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=ConfigurationDB,
     status_code=201,
@@ -37,7 +37,7 @@ async def create_configuration(new_configuration: ConfigurationCreate):
 
 
 @router.get(
-    "/{configuration_id}",
+    "/{configuration_id}/",
     response_class=JSONResponse,
     response_model=ConfigurationDB,
     status_code=200,
@@ -50,7 +50,7 @@ async def get_configuration_by_id(configuration_id: UUID = Path(...)):
 
 
 @router.patch(
-    "/{configuration_id}",
+    "/{configuration_id}/",
     response_class=Response,
     status_code=204,
 )
@@ -61,7 +61,7 @@ async def update_configuration(
 
 
 @router.delete(
-    "/{configuration_id}",
+    "/{configuration_id}/",
     response_class=Response,
     status_code=204,
 )
