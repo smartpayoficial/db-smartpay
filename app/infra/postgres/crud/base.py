@@ -23,9 +23,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         return await self.model.get_or_none(**{pk: id})
 
     async def get_all(
-        self, *, skip: int = 0, limit: int = 100, filters: Dict[str, Any] = {}
+        self,
+        *,
+        skip: int = 0,
+        limit: int = 100,
+        filters: Dict[str, Any] = {},
+        prefetch_fields: Optional[List[str]] = None,
     ) -> List[ModelType]:
-        return await self.model.filter(**filters).all().offset(skip).limit(limit)
+        query = self.model.filter(**filters)
+        if prefetch_fields:
+            query = query.prefetch_related(*prefetch_fields)
+        return await query.offset(skip).limit(limit).all()
 
     async def create(self, *, obj_in: CreateSchemaType) -> ModelType:
         obj_in_data = obj_in.dict()
