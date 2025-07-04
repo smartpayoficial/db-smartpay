@@ -17,18 +17,20 @@ class CRUDDevice(CRUDBase[Device, DeviceCreate, DeviceUpdate]):
         )
 
     async def get_all(
-        self, *, filters: Optional[Dict[str, Any]] = None, skip: int = 0, limit: int = 100
+        self,
+        *,
+        filters: Optional[Dict[str, Any]] = None,
+        skip: int = 0,
+        limit: int = 100
     ) -> List[Device]:
-        """
-        Obtiene una lista de dispositivos, con la capacidad de filtrar.
-        El prefetching se puede añadir aquí si es necesario para la lista.
-        """
         query = self.model.all()
         if filters:
+            filters = filters.copy()
             if "enrolment_id" in filters:
                 filters["enrolment__enrolment_id"] = filters.pop("enrolment_id")
             query = query.filter(**filters)
-        return await query.offset(skip).limit(limit)
+        results = await query.offset(skip).limit(limit)
+        return results
 
 
 crud_device = CRUDDevice(model=Device)
