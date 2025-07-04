@@ -42,17 +42,37 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         return model
 
     async def update(self, *, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> bool:
+        import logging
+        logger = logging.getLogger(__name__)
+        
         pk = self.model._meta.pk_attr
+        logger.info(f"Actualizando modelo {self.model.__name__} con pk={pk}, id={id}")
+        
+        # Obtenemos solo los campos que se han establecido explícitamente
         update_data = (
-            obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_unset=True)
+            obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_unset=True, exclude_none=True)
         )
+        
+        logger.info(f"Datos de actualización: {update_data}")
 
         if not update_data:
+            logger.warning("No hay datos para actualizar, retornando False")
             return False
 
-        updated_count = await self.model.filter(**{pk: id}).update(**update_data)
-
-        return updated_count > 0
+        try:
+            # Primero obtenemos el objeto existente para verificar que existe
+            obj = await self.model.get_or_none(**{pk: id})
+            if not obj:
+                logger.warning(f"No se encontró el objeto con {pk}={id}")
+                return False
+                
+            # Actualizamos solo los campos proporcionados
+            updated_count = await self.model.filter(**{pk: id}).update(**update_data)
+            logger.info(f"Registros actualizados: {updated_count}")
+            return updated_count > 0
+        except Exception as e:
+            logger.error(f"Error al actualizar: {str(e)}")
+            raise
 
     async def delete(self, *, id: Any) -> bool:
         pk = self.model._meta.pk_attr

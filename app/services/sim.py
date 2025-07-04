@@ -14,18 +14,18 @@ class SimService:
         return await crud_sim.get(id=id)
 
     async def get_by_number(self, *, number: str) -> Optional[Sim]:
-        sims = await crud_sim.get_all(filters={"number": number}, limit=1)
+        sims = await crud_sim.get_all(payload={"number": number}, limit=1)
         return sims[0] if sims else None
 
     async def get_by_device_id(
         self, *, device_id: UUID, skip: int = 0, limit: int = 100
     ) -> List[Sim]:
         return await crud_sim.get_all(
-            filters={"device_id": device_id}, skip=skip, limit=limit
+            payload={"device_id": device_id}, skip=skip, limit=limit
         )
 
     async def get_by_icc_id(self, *, icc_id: str) -> Optional[Sim]:
-        sims = await crud_sim.get_all(filters={"icc_id": icc_id}, limit=1)
+        sims = await crud_sim.get_all(payload={"icc_id": icc_id}, limit=1)
         return sims[0] if sims else None
 
     async def get_all(self, *, skip: int = 0, limit: int = 100) -> List[Sim]:

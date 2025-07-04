@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     response_class=JSONResponse,
     response_model=List[Sim],
     status_code=status.HTTP_200_OK,
@@ -44,24 +44,6 @@ async def get_sims_by_device(
 
 
 @router.get(
-    "/{sim_id}",
-    response_class=JSONResponse,
-    response_model=Sim,
-    status_code=status.HTTP_200_OK,
-    summary="Get SIM card by ID",
-    description="Retrieve a specific SIM card by its ID.",
-)
-async def get_sim(sim_id: UUID = Path(..., description="The ID of the SIM card")):
-    sim_card = await sim_service.get(id=sim_id)
-    if not sim_card:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"SIM card with ID {sim_id} not found",
-        )
-    return sim_card
-
-
-@router.get(
     "/number/{number}",
     response_class=JSONResponse,
     response_model=Sim,
@@ -81,8 +63,26 @@ async def get_sim_by_number(
     return sim_card
 
 
+@router.get(
+    "/{sim_id}",
+    response_class=JSONResponse,
+    response_model=Sim,
+    status_code=status.HTTP_200_OK,
+    summary="Get SIM card by ID",
+    description="Retrieve a specific SIM card by its ID.",
+)
+async def get_sim(sim_id: UUID = Path(..., description="The ID of the SIM card")):
+    sim_card = await sim_service.get(id=sim_id)
+    if not sim_card:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"SIM card with ID {sim_id} not found",
+        )
+    return sim_card
+
+
 @router.post(
-    "/",
+    "",
     response_class=JSONResponse,
     response_model=Sim,
     status_code=status.HTTP_201_CREATED,

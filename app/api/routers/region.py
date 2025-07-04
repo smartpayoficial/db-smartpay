@@ -51,7 +51,22 @@ async def get_region_by_id(region_id: UUID = Path(...)):
     status_code=204,
 )
 async def update_region(update_region: RegionUpdate, region_id: UUID = Path(...)):
-    await region_service.update(id=region_id, obj_in=update_region)
+    # Primero verificamos si la región existe
+    region = await region_service.get(id=region_id)
+    if region is None:
+        raise HTTPException(status_code=404, detail="Region not found")
+    
+    # Verificamos si hay datos para actualizar
+    update_data = update_region.dict(exclude_unset=True)
+    if not update_data:
+        # Si no hay datos para actualizar, simplemente devolvemos 204 No Content
+        return
+    
+    # Si hay datos para actualizar, procedemos con la actualización
+    updated = await region_service.update(id=region_id, obj_in=update_region)
+    if not updated:
+        # Esto no debería ocurrir ya que verificamos que la región existe
+        raise HTTPException(status_code=500, detail="Failed to update region")
 
 
 @router.delete(

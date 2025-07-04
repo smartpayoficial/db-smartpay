@@ -90,7 +90,7 @@ async def update_user(user_id: UUID, user_in: UserUpdate):
 )
 async def delete_user(user_id: UUID):
     """Elimina un usuario."""
-    user = await user_service.remove(id=user_id)
-    if user is None:
+    deleted = await user_service.delete(id=user_id)
+    if not deleted:
         raise HTTPException(status_code=404, detail="User not found")
     return Response(status_code=204)
