@@ -24,7 +24,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     ) -> List[ModelType]:
         crud_params = {"skip": skip, "limit": limit}
         if payload is not None:
-            crud_params["filters"] = payload
+            crud_params.update(payload)
         if prefetch_fields:
             crud_params["prefetch_fields"] = prefetch_fields
 
