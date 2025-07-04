@@ -37,8 +37,8 @@ api_router.include_router(device_router, prefix="/devices", tags=["devices"])
 api_router.include_router(enrolment_router, prefix="/enrolments", tags=["enrolments"])
 api_router.include_router(
     factory_reset_protection_router,
-    prefix="/factoryResetProtection",
-    tags=["factoryResetProtection"],
+    prefix="/factory-reset-protections",
+    tags=["factory-reset-protections"],
 )
 api_router.include_router(internal_auth_router, tags=["internal_auth"])
 api_router.include_router(location_router, prefix="/locations", tags=["locations"])

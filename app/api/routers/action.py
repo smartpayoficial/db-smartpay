@@ -20,14 +20,14 @@ async def get_all_actions(
     skip: int = 0,
     limit: int = 100,
 ):
-    filters = {}
+    payload = {}
     if device_id:
-        filters["device_id"] = device_id
+        payload["device_id"] = device_id
     if state:
-        filters["state"] = state
+        payload["state"] = state
 
     return await action_service.get_all(
-        skip=skip, limit=limit, filters=filters, prefetch_fields=["applied_by__role"]
+        skip=skip, limit=limit, payload=payload, prefetch_fields=["applied_by__role"]
     )
 
 @router.post("", response_model=ActionResponse, response_class=JSONResponse, status_code=201)

@@ -7,7 +7,7 @@ from app.schemas.action import ActionCreate, ActionUpdate
 
 class CRUDAction(CRUDBase[Action, ActionCreate, ActionUpdate]):
     async def get_all(
-        self, *, skip: int = 0, limit: int = 100, filters: Optional[Dict[str, Any]] = None
+        self, *, skip: int = 0, limit: int = 100, filters: Optional[Dict[str, Any]] = None, prefetch_fields: Optional[List[str]] = None
     ) -> List[Action]:
         query = self.model.all().prefetch_related("applied_by__role")
         if filters:

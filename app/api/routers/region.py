@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[RegionDB],
     status_code=200,
@@ -22,7 +22,7 @@ async def get_all_regions():
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=RegionDB,
     status_code=201,
@@ -39,7 +39,7 @@ async def create_region(new_region: RegionCreate):
     status_code=200,
 )
 async def get_region_by_id(region_id: UUID = Path(...)):
-    region = await region_service.get_by_id(id=region_id)
+    region = await region_service.get(id=region_id)
     if region is None:
         raise HTTPException(status_code=404, detail="Region not found")
     return region

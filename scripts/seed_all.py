@@ -58,7 +58,7 @@ async def seed():
         # --- Geografía ---
         print("\nSeeding country…")
         country = await _request(
-            client, "post", "/countries", json={"name": "Peru", "code": "PE"}
+            client, "post", "/countries/", json={"name": "Peru", "code": "PE"}
         )
         if not country:
             print("No se pudo sembrar el país, abortando.")
@@ -67,7 +67,7 @@ async def seed():
 
         print("Seeding region…")
         region = await _request(
-            client, "post", "/regions", json={"name": "Lima", "country_id": country_id}
+            client, "post", "/regions/", json={"name": "Lima", "country_id": country_id}
         )
         if not region:
             print("No se pudo sembrar la región, abortando.")
@@ -91,7 +91,7 @@ async def seed():
         role_superadmin = await _request(
             client,
             "post",
-            "/roles",
+            "/roles/",
             json={
                 "name": "Superadmin",
                 "description": "Administrador de sistema principal",
@@ -100,19 +100,19 @@ async def seed():
         role_admin = await _request(
             client,
             "post",
-            "/roles",
+            "/roles/",
             json={"name": "Admin", "description": "Administrador de plataforma"},
         )
         role_vendor = await _request(
             client,
             "post",
-            "/roles",
+            "/roles/",
             json={"name": "Vendedor", "description": "Usuario vendedor"},
         )
         role_customer = await _request(
             client,
             "post",
-            "/roles",
+            "/roles/",
             json={"name": "Cliente", "description": "Usuario final o cliente"},
         )
 
@@ -134,7 +134,7 @@ async def seed():
         user_superadmin = await _request(
             client,
             "post",
-            "/users",
+            "/users/",
             json={
                 "city_id": city_id,
                 "dni": "10000000",
@@ -155,7 +155,7 @@ async def seed():
         user_admin = await _request(
             client,
             "post",
-            "/users",
+            "/users/",
             json={
                 "city_id": city_id,
                 "dni": "20000000",
@@ -176,7 +176,7 @@ async def seed():
         user_vendor_obj = await _request(
             client,
             "post",
-            "/users",
+            "/users/",
             json={
                 "city_id": city_id,
                 "dni": "30000000",
@@ -199,7 +199,7 @@ async def seed():
         user_customer_obj = await _request(
             client,
             "post",
-            "/users",
+            "/users/",
             json={
                 "city_id": city_id,
                 "dni": "40000000",
@@ -320,6 +320,33 @@ async def seed():
                     "device_id": device_id,
                     "plan_id": plan_id,
                     "value": "200.00",
+                    "method": "transfer",
+                    "state": "Approved",
+                    "date": "2025-03-01T12:00:00",
+
+            payments_payload = [
+                {
+                    "plan_id": plan_id,
+                    "amount": 100.00,
+                    "currency": "PEN",
+                    "method": "cash",
+                    "state": "Completed",
+                    "date": "2025-01-01T12:00:00",
+                    "reference": "PAYMENTREF001",
+                },
+                {
+                    "plan_id": plan_id,
+                    "amount": 150.50,
+                    "currency": "USD",
+                    "method": "credit_card",
+                    "state": "Pending",
+                    "date": "2025-02-15T10:30:00",
+                    "reference": "PAYMENTREF002",
+                },
+                {
+                    "plan_id": plan_id,
+                    "amount": 200.00,
+                    "currency": "PEN",
                     "method": "transfer",
                     "state": "Approved",
                     "date": "2025-03-01T12:00:00",

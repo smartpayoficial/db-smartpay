@@ -27,10 +27,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         *,
         skip: int = 0,
         limit: int = 100,
-        filters: Dict[str, Any] = {},
+        payload: Dict[str, Any] = {},
         prefetch_fields: Optional[List[str]] = None,
     ) -> List[ModelType]:
-        query = self.model.filter(**filters)
+        query = self.model.filter(**payload)
         if prefetch_fields:
             query = query.prefetch_related(*prefetch_fields)
         return await query.offset(skip).limit(limit).all()
@@ -48,17 +48,16 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         )
 
         if not update_data:
-            # If there's nothing to update, just check for existence.
-            return await self.model.filter(**{pk: id}).exists()
+            return False
 
         updated_count = await self.model.filter(**{pk: id}).update(**update_data)
 
         return updated_count > 0
 
-    async def delete(self, *, id: Any) -> int:
+    async def delete(self, *, id: Any) -> bool:
         pk = self.model._meta.pk_attr
         deleted_count = await self.model.filter(**{pk: id}).delete()
-        return deleted_count
+        return deleted_count > 0
 
     async def count(self, *, payload: Dict[str, Any] = {}) -> int:
         count = await self.model.filter(**payload).all().count()

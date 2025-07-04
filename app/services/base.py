@@ -15,9 +15,20 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.crud = crud
 
     async def get_all(
-        self, *, skip: int = 0, limit: int = 100, filters: Optional[Dict[str, Any]] = None
+        self,
+        *,
+        skip: int = 0,
+        limit: int = 100,
+        payload: Optional[Dict[str, Any]] = None,
+        prefetch_fields: Optional[List[str]] = None,
     ) -> List[ModelType]:
-        return await self.crud.get_all(skip=skip, limit=limit, filters=filters or {})
+        crud_params = {"skip": skip, "limit": limit}
+        if payload is not None:
+            crud_params["filters"] = payload
+        if prefetch_fields:
+            crud_params["prefetch_fields"] = prefetch_fields
+
+        return await self.crud.get_all(**crud_params)
 
     async def get(self, id: Any) -> Optional[ModelType]:
         return await self.crud.get(id=id)
@@ -48,5 +59,5 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def update(self, *, id: Any, obj_in: UpdateSchemaType) -> ModelType:
         return await self.crud.update(id=id, obj_in=obj_in)
 
-    async def remove(self, *, id: Any) -> ModelType:
+    async def delete(self, *, id: Any) -> bool:
         return await self.crud.delete(id=id)

@@ -28,18 +28,18 @@ async def get_all_users(
     limit: int = 100,
 ):
     """Obtiene todos los usuarios con sus roles resueltos. Permite filtrar y paginar."""
-    filters = {}
+    payload = {}
     if role_name:
-        filters["role__name__iexact"] = role_name
+        payload["role__name__iexact"] = role_name
     if state:
-        filters["state__iexact"] = state
+        payload["state__iexact"] = state
 
-    users = await user_service.get_all(filters=filters, skip=skip, limit=limit)
+    users = await user_service.get_all(payload=payload, skip=skip, limit=limit)
     return users
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=UserOut,
     status_code=201,

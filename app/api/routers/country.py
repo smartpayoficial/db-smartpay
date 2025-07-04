@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.get(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=List[CountryDB],
     status_code=200,
@@ -22,7 +22,7 @@ async def get_all_countries():
 
 
 @router.post(
-    "",
+    "/",
     response_class=JSONResponse,
     response_model=CountryDB,
     status_code=201,
@@ -39,7 +39,7 @@ async def create_country(new_country: CountryCreate):
     status_code=200,
 )
 async def get_country_by_id(country_id: UUID = Path(...)):
-    country = await country_service.get_by_id(id=country_id)
+    country = await country_service.get(id=country_id)
     if country is None:
         raise HTTPException(status_code=404, detail="Country not found")
     return country
