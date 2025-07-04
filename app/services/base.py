@@ -22,13 +22,31 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         payload: Optional[Dict[str, Any]] = None,
         prefetch_fields: Optional[List[str]] = None,
     ) -> List[ModelType]:
-        crud_params = {"skip": skip, "limit": limit}
-        if payload is not None:
-            crud_params.update(payload)
+        # Parámetros básicos que todas las implementaciones de CRUD aceptan
+        base_params = {"skip": skip, "limit": limit}
         if prefetch_fields:
-            crud_params["prefetch_fields"] = prefetch_fields
-
-        return await self.crud.get_all(**crud_params)
+            base_params["prefetch_fields"] = prefetch_fields
+            
+        # Si no hay filtros, simplemente llamamos al método con los parámetros básicos
+        if payload is None:
+            return await self.crud.get_all(**base_params)
+            
+        # Intentamos primero con el parámetro 'filters'
+        try:
+            filters_params = base_params.copy()
+            filters_params["filters"] = payload
+            return await self.crud.get_all(**filters_params)
+        except TypeError:
+            # Si falla, intentamos con el parámetro 'payload'
+            try:
+                payload_params = base_params.copy()
+                payload_params["payload"] = payload
+                return await self.crud.get_all(**payload_params)
+            except TypeError:
+                # Si ambos fallan, intentamos pasar los filtros directamente
+                direct_params = base_params.copy()
+                direct_params.update(payload)
+                return await self.crud.get_all(**direct_params)
 
     async def get(self, id: Any) -> Optional[ModelType]:
         return await self.crud.get(id=id)
