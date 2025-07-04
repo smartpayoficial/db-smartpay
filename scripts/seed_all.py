@@ -228,7 +228,7 @@ async def seed():
         enrolment = await _request(
             client,
             "post",
-            "/enrolments",
+            "/enrolments/",
             json={"user_id": customer_id, "vendor_id": vendor_id},
         )
         print("enrolment response:", enrolment)
@@ -254,7 +254,7 @@ async def seed():
             "product_name": "ProductoDEF",
         }
         print("device payload:", device_payload)
-        device = await _request(client, "post", "/devices", json=device_payload)
+        device = await _request(client, "post", "/devices/", json=device_payload)
         print("device response:", device)
         if not device or not isinstance(device, dict) or "device_id" not in device:
             print(
@@ -271,7 +271,7 @@ async def seed():
         await _request(
             client,
             "post",
-            "/sims",
+            "/sims/",
             json={
                 "device_id": device_id,
                 "icc_id": "89314404000165000001",
@@ -320,36 +320,6 @@ async def seed():
                     "device_id": device_id,
                     "plan_id": plan_id,
                     "value": "200.00",
-                    "method": "transfer",
-                    "state": "Approved",
-                    "date": "2025-03-01T12:00:00",
-                    "reference": "PAYMENTREF003",
-                },
-            ]
-
-            payments_payload = [
-                {
-                    "plan_id": plan_id,
-                    "amount": 100.00,
-                    "currency": "PEN",
-                    "method": "cash",
-                    "state": "Completed",
-                    "date": "2025-01-01T12:00:00",
-                    "reference": "PAYMENTREF001",
-                },
-                {
-                    "plan_id": plan_id,
-                    "amount": 150.50,
-                    "currency": "USD",
-                    "method": "credit_card",
-                    "state": "Pending",
-                    "date": "2025-02-15T10:30:00",
-                    "reference": "PAYMENTREF002",
-                },
-                {
-                    "plan_id": plan_id,
-                    "amount": 200.00,
-                    "currency": "PEN",
                     "method": "transfer",
                     "state": "Approved",
                     "date": "2025-03-01T12:00:00",
