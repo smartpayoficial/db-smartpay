@@ -323,6 +323,9 @@ async def seed():
                     "method": "transfer",
                     "state": "Approved",
                     "date": "2025-03-01T12:00:00",
+                    "reference": "PAYMENTREF003",
+                },
+            ]
 
             payments_payload = [
                 {
