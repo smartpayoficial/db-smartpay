@@ -20,8 +20,15 @@ router = APIRouter()
     response_model=List[ConfigurationDB],
     status_code=200,
 )
-async def get_all_configurations():
-    configurations = await configuration_service.get_all()
+async def get_all_configurations(key: str = None):
+    import sys
+    
+    filters = {}
+    if key:
+        filters["key"] = key
+        print(f"DEBUG: Filtrando configuraciones por key={key}", file=sys.stderr)
+    
+    configurations = await configuration_service.get_all(payload=filters) if filters else await configuration_service.get_all()
     return configurations
 
 
@@ -43,7 +50,7 @@ async def create_configuration(new_configuration: ConfigurationCreate):
     status_code=200,
 )
 async def get_configuration_by_id(configuration_id: UUID = Path(...)):
-    configuration = await configuration_service.get_by_id(id=configuration_id)
+    configuration = await configuration_service.get(id=configuration_id)
     if configuration is None:
         raise HTTPException(status_code=404, detail="Configuration not found")
     return configuration
