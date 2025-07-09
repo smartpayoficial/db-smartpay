@@ -15,8 +15,8 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
     async def create(self, *, obj_in: PaymentCreate) -> Payment:
         obj_in_data = obj_in.dict()
         model = await self.model.create(**obj_in_data)
-        # Re-fetch to load relationships
-        return await self.get(id=model.payment_id)
+        # Re-fetch with all relationships to ensure complete data in response
+        return await self.get_by_id(_id=model.payment_id)
     async def get_all(self, *, skip: int = 0, limit: int = 100, payload: Optional[dict] = None, plan_id: Optional[UUID] = None) -> List[Payment]:
         import logging
         logger = logging.getLogger(__name__)
