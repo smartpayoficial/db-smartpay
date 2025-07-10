@@ -67,3 +67,13 @@ class UserDB(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class UserPaymentResponse(BaseModel):
+    first_name: str
+    middle_name: Optional[str]
+    last_name: str
+    second_last_name: Optional[str]
+
+    class Config:
+        orm_mode = True

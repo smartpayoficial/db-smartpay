@@ -5,8 +5,9 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
-from app.schemas.device import DeviceResponse
-from app.schemas.user import UserDB
+
+from app.schemas.device import DeviceDB
+from app.schemas.user import UserPaymentResponse
 
 
 class PaymentState(str, Enum):
@@ -22,6 +23,7 @@ class PlanBase(BaseModel):
     vendor_id: UUID
     device_id: UUID
     initial_date: date
+    value: Decimal
     quotas: int
     contract: str
 
@@ -35,6 +37,7 @@ class PlanUpdate(BaseModel):
     vendor_id: Optional[UUID] = None
     device_id: Optional[UUID] = None
     initial_date: Optional[date] = None
+    value: Optional[Decimal] = None
     quotas: Optional[int] = None
     contract: Optional[str] = None
 
@@ -48,8 +51,9 @@ class PlanDB(PlanBase):
 
 class PlanResponse(PlanBase):
     plan_id: UUID
-    user: UserDB
-    vendor: UserDB
+    user: UserPaymentResponse
+    vendor: UserPaymentResponse
+    device: DeviceDB
 
     class Config:
         orm_mode = True
@@ -93,7 +97,6 @@ class PaymentResponse(BaseModel):
     state: PaymentState
     date: datetime
     reference: str
-    device: DeviceResponse
     plan: PlanResponse
 
     class Config:

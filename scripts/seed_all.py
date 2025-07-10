@@ -290,6 +290,7 @@ async def seed():
             "user_id": customer_id,
             "vendor_id": vendor_id,
             "device_id": device_id,
+            "value": "1000000.00",
             "initial_date": "2025-01-01",
             "quotas": 12,
             "contract": "Contrato de seed demo",
