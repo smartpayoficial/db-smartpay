@@ -94,3 +94,31 @@ async def delete_user(user_id: UUID):
     if not deleted:
         raise HTTPException(status_code=404, detail="User not found")
     return Response(status_code=204)
+
+
+@router.get(
+    "/by-dni/{dni}",
+    response_class=JSONResponse,
+    response_model=UserOut,
+    status_code=200,
+)
+async def get_user_by_dni(dni: str = Path(..., description="DNI del usuario")):
+    """Obtiene un usuario por su DNI."""
+    user = await user_service.get_by_dni(dni=dni)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+@router.get(
+    "/by-email/{email}",
+    response_class=JSONResponse,
+    response_model=UserOut,
+    status_code=200,
+)
+async def get_user_by_email(email: str = Path(..., description="Email del usuario")):
+    """Obtiene un usuario por su email."""
+    user = await user_service.get_by_email(email=email)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user

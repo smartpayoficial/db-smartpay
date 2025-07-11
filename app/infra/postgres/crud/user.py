@@ -50,6 +50,18 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         
         await db_obj.save()
         return db_obj
+        
+    async def get_by_dni(self, *, dni: str) -> Optional[User]:
+        """
+        Obtiene un usuario por su DNI, con las relaciones 'role' y 'city' precargadas.
+        """
+        return await self.model.filter(dni=dni).select_related("role", "city").first()
+        
+    async def get_by_email(self, *, email: str) -> Optional[User]:
+        """
+        Obtiene un usuario por su email, con las relaciones 'role' y 'city' precargadas.
+        """
+        return await self.model.filter(email__iexact=email).select_related("role", "city").first()
 
 
 crud_user = CRUDUser(model=User)
