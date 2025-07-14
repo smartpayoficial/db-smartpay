@@ -8,3 +8,8 @@ CrudType = TypeVar("CrudType", bound=Any)
 
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
+
+
+class CountResponse(BaseModel):
+    """Schema for count responses"""
+    count: int

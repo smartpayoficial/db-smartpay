@@ -1,3 +1,4 @@
+from typing import Dict, Any, Optional
 from fastapi import HTTPException, status
 from tortoise.exceptions import IntegrityError
 
@@ -27,6 +28,15 @@ class DeviceService(BaseService[Device, DeviceCreate, DeviceUpdate]):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Database integrity error: {e}",
             )
+            
+    async def count(self) -> int:
+        """
+        Count the total number of devices in the system.
+        
+        Returns:
+            int: The total count of devices
+        """
+        return await self.crud.count(payload={})
 
 
 device_service = DeviceService(crud_device)

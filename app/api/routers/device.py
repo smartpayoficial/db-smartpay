@@ -1,10 +1,11 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Query, HTTPException, Path
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.device import DeviceCreate, DeviceDB, DeviceUpdate
+from app.schemas.general import CountResponse
 from app.services.device import device_service
 
 # Device Router
@@ -34,6 +35,23 @@ async def get_all_devices(enrolment_id: Optional[str] = Query(None)):
 async def create_device(new_device: DeviceCreate):
     device = await device_service.create(obj_in=new_device)
     return device
+
+
+@router.get(
+    "/count",
+    response_class=JSONResponse,
+    response_model=CountResponse,
+    status_code=200,
+)
+async def count_devices():
+    """
+    Count the total number of devices in the system.
+    
+    Returns:
+        CountResponse: Object containing the total count of devices
+    """
+    count = await device_service.count()
+    return {"count": count}
 
 
 @router.get(
