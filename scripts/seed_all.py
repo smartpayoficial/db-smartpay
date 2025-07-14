@@ -293,6 +293,7 @@ async def seed():
             "value": "1000000.00",
             "initial_date": "2025-01-01",
             "quotas": 12,
+            "period": 30,  # Periodo en días (mensual)
             "contract": "Contrato de seed demo",
         }
         plan = await _request(client, "post", "/plans", json=plan_payload)

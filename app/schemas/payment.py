@@ -25,6 +25,7 @@ class PlanBase(BaseModel):
     initial_date: date
     value: Decimal
     quotas: int
+    period: Optional[int] = None
     contract: str
 
 
@@ -39,6 +40,7 @@ class PlanUpdate(BaseModel):
     initial_date: Optional[date] = None
     value: Optional[Decimal] = None
     quotas: Optional[int] = None
+    period: Optional[int] = None
     contract: Optional[str] = None
 
 

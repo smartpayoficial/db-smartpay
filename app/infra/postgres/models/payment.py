@@ -19,6 +19,7 @@ class Plan(Model):
     device = fields.ForeignKeyField("models.Device", related_name="plans")
     initial_date = fields.DateField()
     quotas = fields.SmallIntField()
+    period = fields.IntField(null=True, description="Periodo en días")
     value = fields.DecimalField(max_digits=10, decimal_places=2)
     contract = fields.CharField(max_length=80)
 
