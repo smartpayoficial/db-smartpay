@@ -1,5 +1,6 @@
 from typing import Optional
 from uuid import UUID
+from datetime import datetime
 
 from pydantic import BaseModel
 from app.schemas.enrolment import EnrolmentResponse
@@ -39,6 +40,8 @@ class DeviceUpdate(BaseModel):
 class DeviceDB(DeviceBase):
     device_id: UUID
     enrolment_id: UUID
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True
@@ -47,6 +50,8 @@ class DeviceDB(DeviceBase):
 class DeviceResponse(DeviceBase):
     device_id: UUID
     enrolment: EnrolmentResponse
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         orm_mode = True

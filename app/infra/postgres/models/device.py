@@ -20,6 +20,8 @@ class Device(Model):
     brand = fields.CharField(max_length=40)
     product_name = fields.CharField(max_length=40)
     state = fields.CharEnumField(DeviceState, default=DeviceState.ACTIVE)
+    created_at = fields.DatetimeField(auto_now_add=True)
+    updated_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
         table = "device"
