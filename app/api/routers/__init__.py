@@ -14,6 +14,7 @@ from .region import router as region_router
 from .role import router as role_router
 from .root import router as root_router
 from .sim import router as sim_router
+from .store import router as store_router
 from .user import router as user_router
 
 __all__ = [
@@ -32,6 +33,7 @@ __all__ = [
     "role_router",
     "root_router",
     "sim_router",
+    "store_router",
     "user_router",
     "factory_reset_protection_router",
 ]

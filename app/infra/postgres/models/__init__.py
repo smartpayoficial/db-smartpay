@@ -10,6 +10,7 @@ from app.infra.postgres.models.payment import Payment, Plan
 from app.infra.postgres.models.region import Region
 from app.infra.postgres.models.role import Role
 from app.infra.postgres.models.sim import Sim
+from app.infra.postgres.models.store import Store
 from app.infra.postgres.models.user import User
 
 __all__ = [
@@ -22,6 +23,7 @@ __all__ = [
     "Region",
     "Role",
     "Sim",
+    "Store",
     "User",
     "Plan",
     "Payment",

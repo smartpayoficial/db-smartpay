@@ -17,6 +17,7 @@ from app.api.routers import (
     role_router,
     root_router,
     sim_router,
+    store_router,
     user_router,
 )
 
@@ -47,4 +48,5 @@ api_router.include_router(plan_router, prefix="/plans", tags=["plans"])
 api_router.include_router(region_router, prefix="/regions", tags=["regions"])
 api_router.include_router(role_router, prefix="/roles", tags=["roles"])
 api_router.include_router(sim_router, prefix="/sims", tags=["sims"])
+api_router.include_router(store_router, prefix="/stores", tags=["stores"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
