@@ -15,10 +15,15 @@ async def create_plan(new_plan: PlanCreate):
     return obj
 
 @router.get("", response_class=JSONResponse, response_model=List[PlanResponse], status_code=200)
-async def get_all_plans(device_id: Optional[UUID] = Query(None, description="Filter plans by device_id")):
+async def get_all_plans(
+    device_id: Optional[UUID] = Query(None, description="Filter plans by device_id"),
+    user_id: Optional[UUID] = Query(None, description="Filter plans by user_id")
+):
     filters = {}
     if device_id:
         filters["device_id"] = device_id
+    if user_id:
+        filters["user_id"] = user_id
     
     # Define the related fields to prefetch
     prefetch_fields = [
