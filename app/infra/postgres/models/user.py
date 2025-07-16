@@ -7,6 +7,7 @@ from tortoise.models import Model
 class UserState(str, Enum):
     ACTIVE = "Active"
     INACTIVE = "Inactive"
+    INITIAL = "Initial"
 
 
 class User(Model):
