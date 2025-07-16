@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.country import CountryCreate, CountryDB, CountryUpdate
@@ -16,8 +16,12 @@ router = APIRouter()
     response_model=List[CountryDB],
     status_code=200,
 )
-async def get_all_countries():
-    countries = await country_service.get_all()
+async def get_all_countries(name: Optional[str] = Query(None, description="Filter countries by name (case-insensitive, partial match)")):
+    filters = {}
+    if name:
+        filters["name__icontains"] = name
+    
+    countries = await country_service.get_all(payload=filters)
     return countries
 
 
