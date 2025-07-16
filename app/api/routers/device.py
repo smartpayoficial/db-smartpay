@@ -18,10 +18,15 @@ router = APIRouter()
     response_model=List[DeviceDB],
     status_code=200,
 )
-async def get_all_devices(enrolment_id: Optional[str] = Query(None)):
+async def get_all_devices(
+    enrolment_id: Optional[str] = Query(None),
+    user_id: Optional[str] = Query(None)
+):
     payload = {}
     if enrolment_id:
         payload["enrolment_id"] = enrolment_id
+    if user_id:
+        payload["user_id"] = user_id
     devices = await device_service.get_all(payload=payload)
     return devices
 
