@@ -3,6 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from app.schemas.country import CountryDB
 
 
 class StoreBase(BaseModel):
@@ -31,6 +32,13 @@ class StoreDB(StoreBase):
     id: UUID
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class StoreWithCountry(StoreDB):
+    country: Optional[CountryDB] = None
 
     class Config:
         orm_mode = True
