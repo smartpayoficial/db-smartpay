@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.city import CityCreate, CityDB, CityUpdate
@@ -16,8 +16,12 @@ router = APIRouter()
     response_model=List[CityDB],
     status_code=200,
 )
-async def get_all_cities():
-    cities = await city_service.get_all()
+async def get_all_cities(name: Optional[str] = Query(None, description="Filter cities by name (case-insensitive, partial match)")):
+    filters = {}
+    if name:
+        filters["name__icontains"] = name
+    
+    cities = await city_service.get_all(payload=filters)
     return cities
 
 
