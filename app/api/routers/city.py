@@ -16,10 +16,15 @@ router = APIRouter()
     response_model=List[CityDB],
     status_code=200,
 )
-async def get_all_cities(name: Optional[str] = Query(None, description="Filter cities by name (case-insensitive, partial match)")):
+async def get_all_cities(
+    name: Optional[str] = Query(None, description="Filter cities by name (case-insensitive, partial match)"),
+    region_id: Optional[UUID] = Query(None, description="Filter cities by region ID")
+):
     filters = {}
     if name:
         filters["name__icontains"] = name
+    if region_id:
+        filters["region_id"] = region_id
     
     cities = await city_service.get_all(payload=filters)
     return cities

@@ -1,7 +1,7 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.region import RegionCreate, RegionDB, RegionUpdate
@@ -16,8 +16,14 @@ router = APIRouter()
     response_model=List[RegionDB],
     status_code=200,
 )
-async def get_all_regions():
-    regions = await region_service.get_all()
+async def get_all_regions(
+    country_id: Optional[UUID] = Query(None, description="Filter regions by country ID")
+):
+    filters = {}
+    if country_id:
+        filters["country_id"] = country_id
+    
+    regions = await region_service.get_all(payload=filters)
     return regions
 
 
