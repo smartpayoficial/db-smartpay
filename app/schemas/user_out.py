@@ -5,9 +5,28 @@ from uuid import UUID
 from pydantic import BaseModel, EmailStr
 
 
+class CountryOut(BaseModel):
+    country_id: UUID
+    name: str
+    code: str
+
+    class Config:
+        orm_mode = True
+
+
+class RegionOut(BaseModel):
+    region_id: UUID
+    name: str
+    country: CountryOut
+
+    class Config:
+        orm_mode = True
+
+
 class CityOut(BaseModel):
     city_id: UUID
     name: str
+    region: RegionOut
 
     class Config:
         orm_mode = True

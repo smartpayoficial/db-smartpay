@@ -8,9 +8,9 @@ from app.schemas.user import UserCreate, UserUpdate
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     async def get(self, *, id: Any) -> Optional[User]:
         """
-        Obtiene un usuario por su ID, con las relaciones 'role' y 'city' precargadas.
+        Obtiene un usuario por su ID, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
         """
-        return await self.model.filter(pk=id).select_related("role", "city").first()
+        return await self.model.filter(pk=id).select_related("role", "city", "city__region", "city__region__country").first()
 
     async def get_all(
         self,
@@ -20,9 +20,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         limit: int = 100,
     ) -> List[User]:
         """
-        Obtiene una lista de usuarios, con las relaciones 'role' y 'city' precargadas.
+        Obtiene una lista de usuarios, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
         """
-        query = self.model.all().select_related("role", "city")
+        query = self.model.all().select_related("role", "city", "city__region", "city__region__country")
         if filters:
             query = query.filter(**filters)
         return await query.offset(skip).limit(limit)
@@ -53,15 +53,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         
     async def get_by_dni(self, *, dni: str) -> Optional[User]:
         """
-        Obtiene un usuario por su DNI, con las relaciones 'role' y 'city' precargadas.
+        Obtiene un usuario por su DNI, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
         """
-        return await self.model.filter(dni=dni).select_related("role", "city").first()
+        return await self.model.filter(dni=dni).select_related("role", "city", "city__region", "city__region__country").first()
         
     async def get_by_email(self, *, email: str) -> Optional[User]:
         """
-        Obtiene un usuario por su email, con las relaciones 'role' y 'city' precargadas.
+        Obtiene un usuario por su email, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
         """
-        return await self.model.filter(email__iexact=email).select_related("role", "city").first()
+        return await self.model.filter(email__iexact=email).select_related("role", "city", "city__region", "city__region__country").first()
 
 
 crud_user = CRUDUser(model=User)
