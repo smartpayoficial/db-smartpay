@@ -104,7 +104,7 @@ main() {
     
     # Paso 1: Habilitar extensión UUID
     print_message $BLUE "=== PASO 1: Configuración inicial ==="
-    run_sql_command "CREATE EXTENSION IF NOT EXISTS 'uuid-ossp';" "Habilitando extensión UUID"
+    run_sql_command 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";' "Habilitando extensión UUID"
     
     # Paso 2: Ejecutar script SQL de países, regiones y ciudades
     print_message $BLUE "=== PASO 2: Inserción de datos geográficos ==="
