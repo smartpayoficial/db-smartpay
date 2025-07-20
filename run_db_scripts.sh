@@ -31,8 +31,8 @@ check_docker() {
 
 # Función para verificar si el contenedor de la base de datos está ejecutándose
 check_db_container() {
-    if ! docker ps | grep -q "docker-smartpay-db-1"; then
-        print_message $RED "Error: El contenedor de la base de datos (docker-smartpay-db-1) no está ejecutándose."
+    if ! docker ps | grep -q "docker-smartpay-db-v12-1"; then
+        print_message $RED "Error: El contenedor de la base de datos (docker-smartpay-db-v12-1) no está ejecutándose."
         print_message $YELLOW "Por favor, inicia los servicios con 'docker-compose up -d'"
         exit 1
     fi
@@ -72,7 +72,7 @@ run_sql_command() {
     print_message $BLUE "Ejecutando: $description"
     print_message $YELLOW "SQL: $sql_command"
     
-    if docker exec -i docker-smartpay-db-1 psql -U postgres -d smartpay -c "$sql_command"; then
+    if docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay -c "$sql_command"; then
         print_message $GREEN "✓ $description completado exitosamente"
     else
         print_message $RED "✗ Error al ejecutar $description"
@@ -138,7 +138,7 @@ main() {
     
     # Verificar tabla store si existe
     print_message $BLUE "Verificando tabla store..."
-    if docker exec -i docker-smartpay-db-1 psql -U postgres -d smartpay -c "SELECT COUNT(*) FROM store;" 2>/dev/null; then
+    if docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay -c "SELECT COUNT(*) FROM store;" 2>/dev/null; then
         print_message $GREEN "✓ Tabla store verificada"
     else
         print_message $YELLOW "⚠ Tabla store no encontrada (puede ser normal si no se ha creado aún)"
