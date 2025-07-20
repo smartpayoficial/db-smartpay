@@ -32,7 +32,7 @@ def main():
     
     # Paso 1: Asegurarse de que la extensión UUID esté habilitada
     print("\n1. Habilitando extensión UUID...")
-    uuid_command = 'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"'
+    uuid_command = 'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay -c "CREATE EXTENSION IF NOT EXISTS \\"uuid-ossp\\";"'
     if run_command(uuid_command) != 0:
         print("Error al habilitar la extensión UUID.")
         sys.exit(1)
