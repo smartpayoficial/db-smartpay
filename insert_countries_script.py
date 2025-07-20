@@ -32,21 +32,21 @@ def main():
     
     # Paso 1: Asegurarse de que la extensión UUID esté habilitada
     print("\n1. Habilitando extensión UUID...")
-    uuid_command = 'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay_prod_db -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"'
+    uuid_command = 'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"'
     if run_command(uuid_command) != 0:
         print("Error al habilitar la extensión UUID.")
         sys.exit(1)
     
     # Paso 2: Ejecutar el script SQL
     print("\n2. Ejecutando script SQL para insertar datos...")
-    sql_command = f'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay_prod_db < {sql_script}'
+    sql_command = f'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay < {sql_script}'
     if run_command(sql_command) != 0:
         print("Error al ejecutar el script SQL.")
         sys.exit(1)
     
     # Paso 3: Verificar que los datos se insertaron correctamente
     print("\n3. Verificando la inserción de datos...")
-    verify_command = 'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay_prod_db -c "SELECT COUNT(*) FROM country; SELECT COUNT(*) FROM region; SELECT COUNT(*) FROM city;"'
+    verify_command = 'docker exec -i docker-smartpay-db-v12-1 psql -U postgres -d smartpay -c "SELECT COUNT(*) FROM country; SELECT COUNT(*) FROM region; SELECT COUNT(*) FROM city;"'
     if run_command(verify_command) != 0:
         print("Error al verificar los datos.")
         sys.exit(1)
