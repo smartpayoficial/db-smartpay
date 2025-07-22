@@ -21,13 +21,15 @@ async def get_analytics_by_date_range(
     end_date: Optional[date] = Query(None, description="Fecha final (YYYY-MM-DD). Si no se proporciona, se usa la fecha actual"),
 ):
     """
-    Obtiene estadísticas totales por rango de fechas.
+    Obtiene estadísticas diarias por rango de fechas.
     
-    Retorna totales para el rango completo:
-    - customers: conteo total de usuarios con rol "Cliente" creados en el rango
-    - devices: conteo total de dispositivos creados en el rango  
-    - payments: valor total de pagos realizados en el rango
-    - vendors: conteo total de usuarios con rol "Vendedor" creados en el rango
+    Retorna:
+    - totales para el rango completo
+    - desglose diario con:
+      - customers: conteo de clientes creados cada día
+      - devices: conteo de dispositivos creados cada día
+      - payments: valor total de pagos cada día
+      - vendors: conteo de vendedores creados cada día
     
     Si solo se proporciona start_date, obtiene datos desde esa fecha hasta hoy.
     """

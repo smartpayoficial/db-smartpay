@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from io import BytesIO
 from typing import List
 
@@ -10,7 +10,7 @@ from app.infra.postgres.models.device import Device
 from app.infra.postgres.models.payment import Payment
 from app.infra.postgres.models.role import Role
 from app.infra.postgres.models.user import User
-from app.schemas.analytics import AnalyticsResponse
+from app.schemas.analytics import AnalyticsResponse, DailyAnalytics
 
 
 class AnalyticsService:
@@ -19,9 +19,9 @@ class AnalyticsService:
         start_date: date, end_date: date = None
     ) -> AnalyticsResponse:
         """
-        Get analytics data for a date range.
+        Get analytics data for a date range with daily breakdowns.
         If end_date is None, use current date.
-        Returns total counts for the entire date range.
+        Returns daily counts and totals for the date range.
         """
         if end_date is None:
             end_date = date.today()
@@ -34,39 +34,70 @@ class AnalyticsService:
         start_datetime = datetime.combine(start_date, datetime.min.time())
         end_datetime = datetime.combine(end_date, datetime.max.time())
 
-        # Get customers count (users with role "Cliente") for the entire range
-        customers_count = await User.filter(
-            created_at__gte=start_datetime,
-            created_at__lte=end_datetime,
-            role__name="Cliente"
-        ).count()
-
-        # Get vendors count (users with role "Vendedor") for the entire range
-        vendors_count = await User.filter(
-            created_at__gte=start_datetime,
-            created_at__lte=end_datetime,
-            role__name="Vendedor"
-        ).count()
-
-        # Get devices count for the entire range
-        devices_count = await Device.filter(
-            created_at__gte=start_datetime,
-            created_at__lte=end_datetime
-        ).count()
-
-        # Get total payments value for the entire range
-        payments = await Payment.filter(
-            date__gte=start_datetime,
-            date__lte=end_datetime
-        ).all()
+        # Initialize daily data list
+        daily_data = []
+        current_date = start_date
         
-        payments_value = sum(float(payment.value) for payment in payments)
-
+        # Calculate totals and daily breakdowns
+        total_customers = 0
+        total_devices = 0
+        total_payments = 0.0
+        total_vendors = 0
+        
+        while current_date <= end_date:
+            current_datetime_start = datetime.combine(current_date, datetime.min.time())
+            current_datetime_end = datetime.combine(current_date, datetime.max.time())
+            
+            # Get customers count for the day
+            customers = await User.filter(
+                role__name="Cliente",
+                created_at__gte=current_datetime_start,
+                created_at__lte=current_datetime_end
+            ).count()
+            
+            # Get vendors count for the day
+            vendors = await User.filter(
+                role__name="Vendedor",
+                created_at__gte=current_datetime_start,
+                created_at__lte=current_datetime_end
+            ).count()
+            
+            # Get devices count for the day
+            devices = await Device.filter(
+                created_at__gte=current_datetime_start,
+                created_at__lte=current_datetime_end
+            ).count()
+            
+            # Get payments value for the day
+            payments = await Payment.filter(
+                date__gte=current_datetime_start,
+                date__lte=current_datetime_end
+            ).all()
+            payments_value = sum(float(payment.value) for payment in payments)
+            
+            # Add to totals
+            total_customers += customers
+            total_vendors += vendors
+            total_devices += devices
+            total_payments += payments_value
+            
+            # Add daily data
+            daily_data.append(DailyAnalytics(
+                date=current_date,
+                customers=customers,
+                devices=devices,
+                payments=payments_value,
+                vendors=vendors
+            ))
+            
+            current_date += timedelta(days=1)
+        
         return AnalyticsResponse(
-            customers=customers_count,
-            devices=devices_count,
-            payments=payments_value,
-            vendors=vendors_count
+            total_customers=total_customers,
+            total_devices=total_devices,
+            total_payments=total_payments,
+            total_vendors=total_vendors,
+            daily_data=daily_data
         )
 
     @staticmethod
