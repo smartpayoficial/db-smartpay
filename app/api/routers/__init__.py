@@ -1,4 +1,5 @@
 from .action import router as action_router
+from .analytics import router as analytics_router
 from .authentication import router as auth_router
 from .city import router as city_router
 from .configuration import router as configuration_router
@@ -19,6 +20,7 @@ from .user import router as user_router
 
 __all__ = [
     "action_router",
+    "analytics_router",
     "auth_router",
     "city_router",
     "configuration_router",

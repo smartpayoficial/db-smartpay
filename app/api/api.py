@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.routers import (
     action_router,
+    analytics_router,
     auth_router,
     city_router,
     configuration_router,
@@ -28,6 +29,7 @@ api_router.include_router(root_router, tags=["Root"])
 
 # Include all other routers
 api_router.include_router(action_router, prefix="/actions", tags=["actions"])
+api_router.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
 api_router.include_router(auth_router, prefix="/auth", tags=["authentication"])
 api_router.include_router(city_router, prefix="/cities", tags=["cities"])
 api_router.include_router(
