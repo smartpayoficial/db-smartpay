@@ -30,68 +30,17 @@ async def get_all_payments(
     filters = {}
     if plan_id:
         filters["plan_id"] = plan_id
-        print(f"DEBUG: Filtrando por plan_id={plan_id}", file=sys.stderr)
     if device_id:
         filters["device_id"] = device_id
-        print(f"DEBUG: Filtrando por device_id={device_id}", file=sys.stderr)
     
     try:
-        # Intentar obtener pagos usando el método CRUD
-        payments = await crud_payment.get_all(payload=filters, skip=skip, limit=limit) if filters else await crud_payment.get_all(skip=skip, limit=limit)
-        print(f"DEBUG: Obtenidos {len(payments)} pagos usando CRUD", file=sys.stderr)
+        # Prefetch related entities
+        payments = await crud_payment.model.filter(**filters).offset(skip).limit(limit).prefetch_related(
+            "plan", "plan__user", "plan__user__role",
+            "plan__vendor", "plan__vendor__role",
+            "device", "device__enrolment", "device__enrolment__user"
+        ).all()
         
-        # Si no hay pagos, crear datos de ejemplo para demostrar el endpoint
-        if not payments:
-            print("DEBUG: No hay pagos. Devolviendo datos de ejemplo.", file=sys.stderr)
-            
-            # Crear datos de ejemplo directamente como JSON
-            from datetime import datetime
-            from uuid import uuid4
-            
-            # Crear un ejemplo de pago para mostrar el formato de respuesta
-            example_payment = {
-                "payment_id": str(uuid4()),
-                "value": 100.0,
-                "method": "Example",
-                "state": "Pending",
-                "date": datetime.now().isoformat(),
-                "reference": "Example Payment",
-                "device_id": str(device_id) if device_id else str(uuid4()),
-                "plan_id": str(plan_id) if plan_id else str(uuid4()),
-                "device": {
-                    "device_id": str(uuid4()),
-                    "serial": "EXAMPLE-SERIAL",
-                    "model": "Example Model",
-                    "vendor_id": str(uuid4()),
-                    "enrolment_id": str(uuid4())
-                },
-                "plan": {
-                    "plan_id": str(plan_id) if plan_id else str(uuid4()),
-                    "user_id": str(uuid4()),
-                    "vendor_id": str(uuid4()),
-                    "device_id": str(device_id) if device_id else str(uuid4()),
-                    "initial_date": datetime.now().date().isoformat(),
-                    "quotas": 12,
-                    "contract": "Example Contract",
-                    "user": {
-                        "user_id": str(uuid4()),
-                        "name": "Example User",
-                        "email": "user@example.com",
-                        "role_id": str(uuid4())
-                    },
-                    "vendor": {
-                        "user_id": str(uuid4()),
-                        "name": "Example Vendor",
-                        "email": "vendor@example.com",
-                        "role_id": str(uuid4())
-                    }
-                }
-            }
-            
-            print("DEBUG: Creado pago de ejemplo para demostrar el formato de respuesta", file=sys.stderr)
-            return [example_payment]
-        
-        # Convertir los modelos ORM a diccionarios para la respuesta
         payment_list = []
         for payment in payments:
             payment_dict = {
@@ -102,15 +51,45 @@ async def get_all_payments(
                 "date": payment.date.isoformat(),
                 "reference": payment.reference,
                 "device_id": str(payment.device_id),
-                "plan_id": str(payment.plan_id)
+                "plan_id": str(payment.plan_id),
+                "device": {
+                    "device_id": str(payment.device.device_id),
+                    "name": payment.device.name,
+                    "imei": payment.device.imei,
+                    "serial_number": payment.device.serial_number,
+                    "model": payment.device.model,
+                    "brand": payment.device.brand,
+                    "product_name": payment.device.product_name,
+                    "state": payment.device.state
+                } if payment.device else None,
+                "plan": {
+                    "plan_id": str(payment.plan.plan_id),
+                    "user": {
+                        "user_id": str(payment.plan.user.user_id),
+                        "first_name": payment.plan.user.first_name,
+                        "middle_name": payment.plan.user.middle_name,
+                        "last_name": payment.plan.user.last_name,
+                        "second_last_name": payment.plan.user.second_last_name,
+                        "email": payment.plan.user.email,
+                        "role": payment.plan.user.role.name if payment.plan.user.role else None
+                    } if payment.plan.user else None,
+                    "vendor": {
+                        "user_id": str(payment.plan.vendor.user_id),
+                        "first_name": payment.plan.vendor.first_name,
+                        "middle_name": payment.plan.vendor.middle_name,
+                        "last_name": payment.plan.vendor.last_name,
+                        "second_last_name": payment.plan.vendor.second_last_name,
+                        "email": payment.plan.vendor.email,
+                        "role": payment.plan.vendor.role.name if payment.plan.vendor.role else None
+                    } if payment.plan.vendor else None
+                } if payment.plan else None
             }
             payment_list.append(payment_dict)
         
         return payment_list
     except Exception as e:
         print(f"DEBUG: Error al obtener pagos: {str(e)}", file=sys.stderr)
-        # En caso de error, devolver lista vacía
-        return []
+        raise HTTPException(status_code=500, detail="Error retrieving payments")
 
 @router.get("/{payment_id}", response_class=JSONResponse, response_model=PaymentResponse, status_code=200)
 async def get_payment_by_id(payment_id: UUID = Path(...)):
