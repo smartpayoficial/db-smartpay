@@ -35,8 +35,10 @@ class RoleDB(RoleBase):
 
 
 # --- NUEVO: Esquema para la salida de roles ---
-class RoleOut(RoleBase):
-    role_id: UUID
+class RoleOut(BaseModel):
+    role_id: Optional[UUID] = None
+    name: Optional[str] = None
+    description: Optional[str] = None
 
     class Config:
         orm_mode = True

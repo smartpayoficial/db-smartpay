@@ -33,16 +33,16 @@ class StoreUpdate(BaseModel):
 
 class StoreDB(StoreBase):
     id: UUID
-    admin: Optional[UserDB] = None
     created_at: datetime
     updated_at: datetime
+    admin: Optional[UserDB] = None
+    country: Optional[CountryDB] = None
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class StoreWithCountry(StoreDB):
-    country: Optional[CountryDB] = None
-
     class Config:
         orm_mode = True

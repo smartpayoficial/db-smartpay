@@ -7,6 +7,7 @@ class Store(Model):
     nombre = fields.CharField(max_length=100)
     country = fields.ForeignKeyField("models.Country", related_name="stores")
     admin = fields.ForeignKeyField("models.User", related_name="admin_stores", null=True)
+    # Eliminado admin_id ya que se crea automáticamente con la relación ForeignKey
     tokens_disponibles = fields.IntField(default=0)
     plan = fields.CharField(max_length=50)
     created_at = fields.DatetimeField(auto_now_add=True)

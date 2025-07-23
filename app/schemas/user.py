@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any, Union
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, Field
@@ -58,15 +58,16 @@ class UserUpdate(BaseModel):
 
 class UserDB(UserBase):
     user_id: UUID
+    role: Optional[Union[RoleOut, Dict[str, Any]]] = None  # Acepta RoleOut o dict
     created_at: datetime
     updated_at: datetime
-    # Nunca serializar este campo
-    password: str = Field(..., exclude=True)
-
-    role: Optional[RoleOut] = None
 
     class Config:
         orm_mode = True
+        from_attributes = True
+        json_encoders = {
+            UUID: str
+        }
 
 
 class UserPaymentResponse(BaseModel):

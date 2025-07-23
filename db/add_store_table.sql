@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS "store" (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     back_link VARCHAR(255),
-    db_link VARCHAR(255)
+    db_link VARCHAR(255),
+    admin_id UUID REFERENCES "user"(id)
 );
 
 -- Create index on country_id for better query performance
