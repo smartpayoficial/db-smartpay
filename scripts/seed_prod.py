@@ -228,6 +228,16 @@ async def seed():
                 "description": "Mensaje de bloqueo de SIM",
             },
         )
+        await _request(
+            client,
+            "post",
+            "/configurations",
+            json={
+                "key": "payment_message",
+                "value": "Gracias por el pago.\nLa aplicación SmartPay te solicitará la desinstalación.",
+                "description": "Mensaje de pago",
+            },
+        )
 
         print("\n✔ Base de datos poblada exitosamente.")
 
