@@ -17,11 +17,14 @@ router = APIRouter()
     status_code=200,
 )
 async def get_all_regions(
-    country_id: Optional[UUID] = Query(None, description="Filter regions by country ID")
+    country_id: Optional[UUID] = Query(None, description="Filter regions by country ID"),
+    name: Optional[str] = Query(None, description="Filter regions by name")
 ):
     filters = {}
     if country_id:
         filters["country_id"] = country_id
+    if name:
+        filters["name__icontains"] = name
     
     regions = await region_service.get_all(payload=filters)
     return regions
