@@ -36,12 +36,24 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         return await query.offset(skip).limit(limit).all()
 
     async def create(self, *, obj_in: CreateSchemaType) -> ModelType:
-        obj_in_data = obj_in.dict()
+        # Manejar tanto objetos Pydantic como diccionarios
+        if hasattr(obj_in, 'dict'):
+            obj_in_data = obj_in.dict()
+        else:
+            # Si es un diccionario, usarlo directamente
+            obj_in_data = obj_in
+        
         # Create a new record in the database
         model = await self.model.create(**obj_in_data)
+        
+        # Asegurar que el modelo se carga con sus relaciones
+        if hasattr(model, 'id'):
+            # Recargar el modelo con sus relaciones
+            model = await self.model.get(id=model.id).prefetch_related(*self.model._meta.fetch_fields)
+        
         return model
 
-    async def update(self, *, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> bool:
+    async def update(self, *, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
         import logging
         logger = logging.getLogger(__name__)
         
@@ -56,20 +68,27 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         logger.info(f"Datos de actualización: {update_data}")
 
         if not update_data:
-            logger.warning("No hay datos para actualizar, retornando False")
-            return False
+            logger.warning("No hay datos para actualizar, retornando objeto original")
+            # Devolvemos el objeto original sin cambios pero con sus relaciones
+            return await self.model.get(id=id).prefetch_related(*self.model._meta.fetch_fields)
 
         try:
             # Primero obtenemos el objeto existente para verificar que existe
             obj = await self.model.get_or_none(**{pk: id})
             if not obj:
                 logger.warning(f"No se encontró el objeto con {pk}={id}")
-                return False
+                return None
                 
             # Actualizamos solo los campos proporcionados
             updated_count = await self.model.filter(**{pk: id}).update(**update_data)
             logger.info(f"Registros actualizados: {updated_count}")
-            return updated_count > 0
+            
+            if updated_count > 0:
+                # Devolvemos el objeto actualizado con sus relaciones
+                return await self.model.get(id=id).prefetch_related(*self.model._meta.fetch_fields)
+            else:
+                # Si no se actualizó nada, devolvemos el objeto original
+                return obj
         except Exception as e:
             logger.error(f"Error al actualizar: {str(e)}")
             raise

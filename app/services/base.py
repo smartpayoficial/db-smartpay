@@ -75,7 +75,31 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 raise HTTPException(status_code=500, detail=f"Error de integridad de datos: {error_message}")
 
     async def update(self, *, id: Any, obj_in: UpdateSchemaType) -> ModelType:
-        return await self.crud.update(id=id, obj_in=obj_in)
+        """Actualiza un objeto por su ID.
+        
+        Args:
+            id: ID del objeto a actualizar
+            obj_in: Datos de actualización (objeto Pydantic o diccionario)
+            
+        Returns:
+            El objeto actualizado con sus relaciones
+        """
+        try:
+            updated = await self.crud.update(id=id, obj_in=obj_in)
+            if updated:
+                # Si el objeto tiene un método from_orm, usarlo para convertir a Pydantic
+                if hasattr(self.crud.model, "from_orm"):
+                    return self.crud.model.from_orm(updated)
+                return updated
+            return None
+        except IntegrityError as e:
+            error_message = str(e).lower()
+            if "violates foreign key constraint" in error_message:
+                raise HTTPException(status_code=400, detail="Referencia a entidad relacionada no válida.")
+            elif "unique constraint" in error_message or "duplicate key" in error_message:
+                raise HTTPException(status_code=409, detail="El recurso ya existe o viola una restricción única.")
+            else:
+                raise HTTPException(status_code=500, detail=f"Error de integridad de datos: {error_message}")
 
     async def delete(self, *, id: Any) -> bool:
         return await self.crud.delete(id=id)
