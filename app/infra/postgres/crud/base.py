@@ -19,7 +19,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         """
         Retrieve a single record by its primary key.
         """
-        pk = self.model._meta.pk_attr
+        pk = self.pk_field
         return await self.model.get_or_none(**{pk: id})
 
     async def get_all(
@@ -47,7 +47,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         model = await self.model.create(**obj_in_data)
         
         # Recargar el modelo con sus relaciones utilizando la clave primaria dinámica
-        pk = self.model._meta.pk_attr
+        pk = self.pk_field
         model = await self.model.get(**{pk: getattr(model, pk)}).prefetch_related(*self.model._meta.fetch_fields)
         return model
 
@@ -55,7 +55,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         import logging
         logger = logging.getLogger(__name__)
         
-        pk = self.model._meta.pk_attr
+        pk = self.pk_field
         logger.info(f"Actualizando modelo {self.model.__name__} con pk={pk}, id={id}")
         
         # Obtenemos solo los campos que se han establecido explícitamente
@@ -92,7 +92,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
             raise
 
     async def delete(self, *, id: Any) -> bool:
-        pk = self.model._meta.pk_attr
+        pk = self.pk_field
         deleted_count = await self.model.filter(**{pk: id}).delete()
         return deleted_count > 0
 
