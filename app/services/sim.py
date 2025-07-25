@@ -56,8 +56,20 @@ class SimService:
     async def update(
         self, *, id: UUID, obj_in: Union[SimUpdate, Dict[str, Any]]
     ) -> bool:
-        # The update method in CRUDBase already checks for existence and returns a boolean
-        updated = await crud_sim.update(id=id, obj_in=obj_in)
+        try:
+            updated = await crud_sim.update(id=id, obj_in=obj_in)
+        except IntegrityError as e:
+            # Handle FK violations (e.g., non-existent device_id)
+            if "foreign key constraint" in str(e).lower():
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Associated device does not exist",
+                )
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error updating SIM card: {e}",
+            )
+
         if not updated:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

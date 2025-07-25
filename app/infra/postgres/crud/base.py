@@ -46,11 +46,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         # Create a new record in the database
         model = await self.model.create(**obj_in_data)
         
-        # Asegurar que el modelo se carga con sus relaciones
-        if hasattr(model, 'id'):
-            # Recargar el modelo con sus relaciones
-            model = await self.model.get(id=model.id).prefetch_related(*self.model._meta.fetch_fields)
-        
+        # Recargar el modelo con sus relaciones utilizando la clave primaria dinámica
+        pk = self.model._meta.pk_attr
+        model = await self.model.get(**{pk: getattr(model, pk)}).prefetch_related(*self.model._meta.fetch_fields)
         return model
 
     async def update(self, *, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]) -> ModelType:
@@ -70,7 +68,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         if not update_data:
             logger.warning("No hay datos para actualizar, retornando objeto original")
             # Devolvemos el objeto original sin cambios pero con sus relaciones
-            return await self.model.get(id=id).prefetch_related(*self.model._meta.fetch_fields)
+            return await self.model.get(**{pk: id}).prefetch_related(*self.model._meta.fetch_fields)
 
         try:
             # Primero obtenemos el objeto existente para verificar que existe
@@ -85,7 +83,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
             
             if updated_count > 0:
                 # Devolvemos el objeto actualizado con sus relaciones
-                return await self.model.get(id=id).prefetch_related(*self.model._meta.fetch_fields)
+                return await self.model.get(**{pk: id}).prefetch_related(*self.model._meta.fetch_fields)
             else:
                 # Si no se actualizó nada, devolvemos el objeto original
                 return obj
