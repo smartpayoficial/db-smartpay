@@ -16,6 +16,7 @@ class Sim(Model):
     class Meta:
         table = "sim"
         ordering = ["created_at"]
+        pk_attr = "sim_id"
 
     def __str__(self):
         return f"{self.number} ({self.operator})"
