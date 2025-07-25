@@ -11,7 +11,7 @@ from app.schemas.sim import SimCreate, SimUpdate
 
 class SimService:
     async def get(self, *, id: UUID) -> Optional[Sim]:
-        return await crud_sim.get(id=id)
+        return await crud_sim.get(sim_id=id)
 
     async def get_by_number(self, *, number: str) -> Optional[Sim]:
         sims = await crud_sim.get_all(payload={"number": number}, limit=1)
@@ -57,7 +57,7 @@ class SimService:
         self, *, id: UUID, obj_in: Union[SimUpdate, Dict[str, Any]]
     ) -> bool:
         try:
-            updated = await crud_sim.update(id=id, obj_in=obj_in)
+            updated = await crud_sim.update(sim_id=id, obj_in=obj_in)
         except IntegrityError as e:
             # Handle FK violations (e.g., non-existent device_id)
             if "foreign key constraint" in str(e).lower():
@@ -79,7 +79,7 @@ class SimService:
 
     async def remove(self, *, id: UUID) -> int:
         # The delete method in CRUDBase returns the count of deleted items
-        deleted_count = await crud_sim.delete(id=id)
+        deleted_count = await crud_sim.delete(sim_id=id)
         if deleted_count == 0:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
