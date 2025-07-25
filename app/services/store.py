@@ -29,21 +29,19 @@ class StoreService(BaseService):
         Returns:
             StoreDB: Tienda creada con sus relaciones
         """
-        # Manejar tanto objetos Pydantic como diccionarios
-        if hasattr(obj_in, 'dict'):
-            store_data = obj_in.dict()
-        else:
-            # Si es un diccionario, validarlo con Pydantic
-            store_data = StoreCreate(**obj_in).dict()
-        
-        if 'admin_id' in store_data and store_data['admin_id'] is None:
-            del store_data['admin_id']
-        store_data['admin_id'] = admin_id
-        
-        # Crear la tienda (el método create en CRUDBase ya carga las relaciones)
-        store = await self.crud.create(obj_in=store_data)
-        
-        # Convertir el modelo Tortoise a Pydantic
+        # Asegurarnos de trabajar siempre con un modelo Pydantic
+        if not hasattr(obj_in, "dict"):
+            # Si llega un diccionario lo validamos/convertimos
+            obj_in = StoreCreate(**obj_in)
+
+        # Si se proporciona admin_id, actualizamos el modelo sin mutarlo en sitio
+        if admin_id is not None:
+            obj_in = obj_in.copy(update={"admin_id": admin_id})
+
+        # Crear la tienda (el CRUD aceptará el modelo Pydantic directamente)
+        store = await self.crud.create(obj_in=obj_in)
+
+        # Convertir el modelo Tortoise a Pydantic antes de retornar
         if store:
             return StoreDB.from_orm(store)
         return None
