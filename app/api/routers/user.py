@@ -24,6 +24,7 @@ pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
 async def get_all_users(
     role_name: Optional[str] = Query(None, description="Filtrar por nombre de rol"),
     state: Optional[str] = Query(None, description="Filtrar por estado del usuario (Active/Inactive)"),
+    name: Optional[str] = Query(None, description="Filtrar por nombre o apellido del usuario"),
     skip: int = 0,
     limit: int = 100,
 ):
@@ -33,6 +34,15 @@ async def get_all_users(
         payload["role__name__iexact"] = role_name
     if state:
         payload["state__iexact"] = state
+    if name:
+        # Implementamos una búsqueda que incluya tanto nombre como apellido
+        from tortoise.expressions import Q
+        return await user_service.get_all_with_filter(
+            Q(first_name__icontains=name) | Q(last_name__icontains=name),
+            payload=payload,
+            skip=skip,
+            limit=limit
+        )
 
     users = await user_service.get_all(payload=payload, skip=skip, limit=limit)
     return users

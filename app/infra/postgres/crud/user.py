@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Optional
 
+from tortoise.expressions import Q
+
 from app.infra.postgres.crud.base import CRUDBase
 from app.infra.postgres.models.user import User
 from app.schemas.user import UserCreate, UserUpdate
@@ -62,6 +64,23 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         Obtiene un usuario por su email, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
         """
         return await self.model.filter(email__iexact=email).select_related("role", "city", "city__region", "city__region__country").first()
+        
+    async def get_all_with_filter(
+        self,
+        *,
+        q_filter: Q,
+        payload: Optional[Dict[str, Any]] = None,
+        skip: int = 0,
+        limit: int = 100,
+    ) -> List[User]:
+        """
+        Obtiene una lista de usuarios aplicando un filtro Q de Tortoise ORM además de los filtros regulares.
+        Las relaciones 'role', 'city', 'city__region' y 'city__region__country' son precargadas.
+        """
+        query = self.model.filter(q_filter).select_related("role", "city", "city__region", "city__region__country")
+        if payload:
+            query = query.filter(**payload)
+        return await query.offset(skip).limit(limit)
 
 
 crud_user = CRUDUser(model=User)
