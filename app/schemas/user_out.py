@@ -41,6 +41,14 @@ class RoleOut(BaseModel):
         orm_mode = True
 
 
+class StoreOut(BaseModel):
+    id: UUID
+    nombre: str
+
+    class Config:
+        orm_mode = True
+
+
 class UserOut(BaseModel):
     user_id: UUID
     dni: str
@@ -58,6 +66,7 @@ class UserOut(BaseModel):
     updated_at: datetime
     role: RoleOut
     city: Optional[CityOut]
+    store: Optional[StoreOut]
 
     class Config:
         orm_mode = True

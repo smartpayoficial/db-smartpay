@@ -10,6 +10,7 @@ from app.schemas.role import RoleOut
 
 class UserBase(BaseModel):
     city_id: UUID
+    store_id: Optional[UUID] = None
     dni: str
     first_name: str
     middle_name: Optional[str]
@@ -36,6 +37,7 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     city_id: Optional[UUID] = None
+    store_id: Optional[UUID] = None
     dni: Optional[str] = None
     first_name: Optional[str] = None
     middle_name: Optional[str] = None

@@ -8,4 +8,5 @@ async def init_db():
         db_url=settings.POSTGRES_DATABASE_URL,
         modules={"models": ["app.infra.postgres.models"]},
     )
-    await Tortoise.generate_schemas()
+    # Skip schema generation since we've already applied migrations manually
+    # await Tortoise.generate_schemas()

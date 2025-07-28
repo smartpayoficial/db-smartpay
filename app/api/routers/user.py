@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path, Query
+from fastapi import APIRouter, HTTPException, Path, Query, Request
 from fastapi.responses import JSONResponse, Response
 from passlib.context import CryptContext
 
@@ -22,9 +22,11 @@ pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
     status_code=200,
 )
 async def get_all_users(
+    request: Request,
     role_name: Optional[str] = Query(None, description="Filtrar por nombre de rol"),
     state: Optional[str] = Query(None, description="Filtrar por estado del usuario (Active/Inactive)"),
     name: Optional[str] = Query(None, description="Filtrar por nombre o apellido del usuario"),
+    store_id: Optional[UUID] = Query(None, description="Filtrar por ID de tienda"),
     skip: int = 0,
     limit: int = 100,
 ):
@@ -43,7 +45,8 @@ async def get_all_users(
             skip=skip,
             limit=limit
         )
-
+    if store_id:
+        payload["store_id"] = store_id
     users = await user_service.get_all(payload=payload, skip=skip, limit=limit)
     return users
 
@@ -128,7 +131,18 @@ async def get_user_by_dni(dni: str = Path(..., description="DNI del usuario")):
 )
 async def get_user_by_email(email: str = Path(..., description="Email del usuario")):
     """Obtiene un usuario por su email."""
-    user = await user_service.get_by_email(email=email)
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+    return await user_service.get_by_email(email=email)
+
+
+@router.get("/by-store/{store_id}", response_model=List[UserOut])
+async def get_users_by_store(
+    request: Request,
+    store_id: UUID,
+    skip: int = 0,
+    limit: int = 100,
+) -> List[UserOut]:
+    """
+    Obtiene todos los usuarios asociados a una tienda específica.
+    """
+    filters = {"store_id": store_id}
+    return await user_service.get_all(payload=filters, skip=skip, limit=limit)

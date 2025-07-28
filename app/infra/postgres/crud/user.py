@@ -10,9 +10,9 @@ from app.schemas.user import UserCreate, UserUpdate
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     async def get(self, *, id: Any) -> Optional[User]:
         """
-        Obtiene un usuario por su ID, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
+        Obtiene un usuario por su ID, con las relaciones 'role', 'city', 'city__region', 'city__region__country' y 'store' precargadas.
         """
-        return await self.model.filter(pk=id).select_related("role", "city", "city__region", "city__region__country").first()
+        return await self.model.filter(pk=id).select_related("role", "city", "city__region", "city__region__country", "store").first()
 
     async def get_all(
         self,
@@ -22,9 +22,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         limit: int = 100,
     ) -> List[User]:
         """
-        Obtiene una lista de usuarios, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
+        Obtiene una lista de usuarios, con las relaciones 'role', 'city', 'city__region', 'city__region__country' y 'store' precargadas.
         """
-        query = self.model.all().select_related("role", "city", "city__region", "city__region__country")
+        query = self.model.all().select_related("role", "city", "city__region", "city__region__country", "store")
         if filters:
             query = query.filter(**filters)
         return await query.offset(skip).limit(limit)
@@ -55,15 +55,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         
     async def get_by_dni(self, *, dni: str) -> Optional[User]:
         """
-        Obtiene un usuario por su DNI, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
+        Obtiene un usuario por su DNI, con las relaciones 'role', 'city', 'city__region', 'city__region__country' y 'store' precargadas.
         """
-        return await self.model.filter(dni=dni).select_related("role", "city", "city__region", "city__region__country").first()
+        return await self.model.filter(dni=dni).select_related("role", "city", "city__region", "city__region__country", "store").first()
         
     async def get_by_email(self, *, email: str) -> Optional[User]:
         """
-        Obtiene un usuario por su email, con las relaciones 'role', 'city', 'city__region' y 'city__region__country' precargadas.
+        Obtiene un usuario por su email, con las relaciones 'role', 'city', 'city__region', 'city__region__country' y 'store' precargadas.
         """
-        return await self.model.filter(email__iexact=email).select_related("role", "city", "city__region", "city__region__country").first()
+        return await self.model.filter(email__iexact=email).select_related("role", "city", "city__region", "city__region__country", "store").first()
         
     async def get_all_with_filter(
         self,
@@ -75,9 +75,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
     ) -> List[User]:
         """
         Obtiene una lista de usuarios aplicando un filtro Q de Tortoise ORM además de los filtros regulares.
-        Las relaciones 'role', 'city', 'city__region' y 'city__region__country' son precargadas.
+        Las relaciones 'role', 'city', 'city__region', 'city__region__country' y 'store' son precargadas.
         """
-        query = self.model.filter(q_filter).select_related("role", "city", "city__region", "city__region__country")
+        query = self.model.filter(q_filter).select_related("role", "city", "city__region", "city__region__country", "store")
         if payload:
             query = query.filter(**payload)
         return await query.offset(skip).limit(limit)
