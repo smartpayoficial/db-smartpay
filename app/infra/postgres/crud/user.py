@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional
 from tortoise.expressions import Q
 
 from app.infra.postgres.crud.base import CRUDBase
-from app.infra.postgres.models.user import User
+from app.infra.postgres.models import Store, User
 from app.schemas.user import UserCreate, UserUpdate
 
 
@@ -47,6 +47,16 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             return None
         
         obj_data = obj_in.dict(exclude_unset=True)
+
+        # Handle store assignment separately
+        if "store_id" in obj_data:
+            store_id = obj_data.pop("store_id")
+            if store_id:
+                store_obj = await Store.get_or_none(id=store_id)
+                db_obj.store = store_obj
+            else:
+                db_obj.store = None
+
         for field, value in obj_data.items():
             setattr(db_obj, field, value)
         
