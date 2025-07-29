@@ -60,7 +60,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         
         # Obtenemos solo los campos que se han establecido explícitamente
         update_data = (
-            obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_unset=True, exclude_none=True)
+            obj_in if isinstance(obj_in, dict) else obj_in.dict(exclude_none=True)
         )
         
         logger.info(f"Datos de actualización: {update_data}")
@@ -77,16 +77,29 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
                 logger.warning(f"No se encontró el objeto con {pk}={id}")
                 return None
                 
-            # Actualizamos solo los campos proporcionados
-            updated_count = await self.model.filter(**{pk: id}).update(**update_data)
-            logger.info(f"Registros actualizados: {updated_count}")
+            # Manejo especial para claves foráneas para asegurar la actualización correcta
+            from app.infra.postgres.models import Store # Importación local para evitar dependencias circulares
+            if 'store_id' in update_data:
+                store_id = update_data.pop('store_id') # Quitamos store_id para manejarlo por separado
+                if store_id:
+                    store_obj = await Store.get_or_none(id=store_id)
+                    if not store_obj:
+                        raise HTTPException(status_code=404, detail=f"Store con id {store_id} no encontrada.")
+                    obj.store = store_obj
+                else:
+                    obj.store = None # Permitir desasociar la tienda
+
+            # Actualizamos los campos restantes
+            for field, value in update_data.items():
+                setattr(obj, field, value)
             
-            if updated_count > 0:
-                # Devolvemos el objeto actualizado con sus relaciones
-                return await self.model.get(**{pk: id}).prefetch_related(*self.model._meta.fetch_fields)
-            else:
-                # Si no se actualizó nada, devolvemos el objeto original
-                return obj
+            # Guardamos el objeto. Tortoise se encargará de las relaciones.
+            await obj.save()
+            logger.info(f"Objeto con {pk}={id} actualizado con los campos: {list(update_data.keys())}")
+
+            # Devolvemos el objeto actualizado con sus relaciones
+            await obj.fetch_related(*self.model._meta.fetch_fields)
+            return obj
         except Exception as e:
             logger.error(f"Error al actualizar: {str(e)}")
             raise
