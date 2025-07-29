@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 from app.infra.postgres.crud.store import crud_store
+from app.infra.postgres.models.user import User
 from app.schemas.store import StoreDB, StoreCreate, StoreUpdate
 from app.services.base import BaseService
 
@@ -75,5 +76,22 @@ class StoreService(BaseService):
         if updated_store:
             return StoreDB.from_orm(updated_store)
         return None
+
+    async def delete(self, *, id: UUID) -> bool:
+        """Delete a store after disassociating all users from it.
+        
+        Args:
+            id: UUID of the store to delete
+            
+        Returns:
+            bool: True if the store was deleted, False otherwise
+        """
+        # First, disassociate all users from this store
+        # Using store_id=None directly instead of store=None
+        await User.filter(store_id=id).update(store_id=None)
+        
+        # Then delete the store
+        return await super().delete(id=id)
+
 
 store_service = StoreService(crud=crud_store)
