@@ -17,9 +17,12 @@ class CRUDFactoryResetProtection(
     ]
 ):
     async def get_by_account_id(
-        self, account_id: UUID
+        self, account_id: UUID, store_id: Optional[UUID] = None
     ) -> Optional[FactoryResetProtection]:
-        return await self.model.filter(account_id=account_id).first()
+        filters = {"account_id": account_id}
+        if store_id:
+            filters["store_id"] = store_id
+        return await self.model.filter(**filters).first()
 
 
 # Instancia que se importa en el servicio

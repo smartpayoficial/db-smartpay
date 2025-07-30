@@ -42,9 +42,12 @@ CREATE TABLE IF NOT EXISTS "role" (
 -- Create configuration table
 CREATE TABLE IF NOT EXISTS "configuration" (
     configuration_id UUID PRIMARY KEY,
-    key VARCHAR(50) UNIQUE NOT NULL,
-    value VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL
+    key VARCHAR(50) NOT NULL,
+    value VARCHAR(1000) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    store_id UUID,
+    UNIQUE(key, store_id),
+    FOREIGN KEY (store_id) REFERENCES store(id)
 );
 
 -- Create authentication table
@@ -112,3 +115,16 @@ CREATE TABLE IF NOT EXISTS "sim" (
 );
 
 CREATE INDEX idx_sim_device_id ON "sim"(device_id);
+
+-- Create factory reset protection table
+CREATE TABLE IF NOT EXISTS "factoryResetProtection" (
+    factory_reset_protection_id UUID PRIMARY KEY,
+    account_id VARCHAR(40) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(80) NOT NULL,
+    state VARCHAR(20) NOT NULL DEFAULT 'Active',
+    store_id UUID,
+    FOREIGN KEY (store_id) REFERENCES store(id),
+    UNIQUE(account_id, store_id),
+    UNIQUE(email, store_id)
+);

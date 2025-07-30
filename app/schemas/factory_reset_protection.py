@@ -15,6 +15,7 @@ class FactoryResetProtectionBase(BaseModel):
     name: str
     email: str
     state: FactoryResetProtectionState
+    store_id: Optional[UUID] = None
 
 
 class FactoryResetProtectionCreate(FactoryResetProtectionBase):

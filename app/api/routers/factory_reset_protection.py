@@ -22,10 +22,13 @@ router = APIRouter()
 )
 async def get_all_factory_protections(
     state: Optional[FactoryResetProtectionState] = None,
+    store_id: Optional[UUID] = None,
 ):
     payload = {}
     if state:
         payload["state"] = state
+    if store_id:
+        payload["store_id"] = store_id
 
     return await factory_reset_protection_service.get_all(payload=payload)
 
@@ -62,10 +65,14 @@ async def get_factory_reset_by_id(factory_reset_protection_id: UUID = Path(...))
     response_model=FactoryResetProtectionResponse,
     response_class=JSONResponse,
 )
-async def get_factory_reset_by_account_id(account_id: str = Path(...)):
+async def get_factory_reset_by_account_id(
+    account_id: str = Path(...),
+    store_id: Optional[UUID] = None
+):
     factoryReset = (
         await factory_reset_protection_service.get_factory_reset_by_account_id(
-            id=account_id
+            id=account_id,
+            store_id=store_id
         )
     )
     if not factoryReset:
