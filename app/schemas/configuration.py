@@ -8,6 +8,7 @@ class ConfigurationBase(BaseModel):
     key: str
     value: str
     description: str
+    store_id: Optional[UUID] = None
 
 
 class ConfigurationCreate(ConfigurationBase):

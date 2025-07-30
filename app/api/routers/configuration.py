@@ -20,7 +20,7 @@ router = APIRouter()
     response_model=List[ConfigurationDB],
     status_code=200,
 )
-async def get_all_configurations(key: str = None):
+async def get_all_configurations(key: str = None, store_id: UUID = None):
     import sys
     
     filters = {}
@@ -28,7 +28,14 @@ async def get_all_configurations(key: str = None):
         filters["key"] = key
         print(f"DEBUG: Filtrando configuraciones por key={key}", file=sys.stderr)
     
+    # Add store_id filter if provided
+    if store_id:
+        filters["store_id"] = store_id
+        print(f"DEBUG: Filtrando configuraciones por store_id={store_id}", file=sys.stderr)
+    
+    # Get configurations with all filters applied at database level
     configurations = await configuration_service.get_all(payload=filters) if filters else await configuration_service.get_all()
+    
     return configurations
 
 
