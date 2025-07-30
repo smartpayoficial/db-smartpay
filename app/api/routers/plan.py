@@ -17,7 +17,8 @@ async def create_plan(new_plan: PlanCreate):
 @router.get("", response_class=JSONResponse, response_model=List[PlanResponse], status_code=200)
 async def get_all_plans(
     device_id: Optional[UUID] = Query(None, description="Filter plans by device_id"),
-    user_id: Optional[UUID] = Query(None, description="Filter plans by user_id")
+    user_id: Optional[UUID] = Query(None, description="Filter plans by user_id"),
+    store_id: Optional[UUID] = Query(None, description="Filter plans by store_id")
 ):
     filters = {}
     if device_id:
@@ -27,14 +28,21 @@ async def get_all_plans(
     
     # Define the related fields to prefetch
     prefetch_fields = [
-        "user", "user__role", 
-        "vendor", "vendor__role", 
+        "user", "user__role", "user__store",
+        "vendor", "vendor__role", "vendor__store",
         "device", "device__enrolment", 
         "device__enrolment__user", "device__enrolment__user__role",
         "device__enrolment__vendor", "device__enrolment__vendor__role"
     ]
     
-    plans = await crud_plan.get_all(payload=filters, prefetch_fields=prefetch_fields)
+    # Get all plans with prefetched related data
+    query = crud_plan.model.filter(**filters).prefetch_related(*prefetch_fields)
+    
+    # If store_id is provided, filter plans where the user belongs to the specified store
+    if store_id:
+        query = query.filter(user__store_id=store_id)
+    
+    plans = await query
     return plans
 
 @router.get("/{plan_id}", response_class=JSONResponse, response_model=PlanResponse, status_code=200)
