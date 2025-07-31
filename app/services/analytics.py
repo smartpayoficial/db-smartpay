@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
 from io import BytesIO
-from typing import List
+from typing import List, Optional
+from uuid import UUID
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment
@@ -16,7 +17,7 @@ from app.schemas.analytics import AnalyticsResponse, DailyAnalytics
 class AnalyticsService:
     @staticmethod
     async def get_analytics_by_date_range(
-        start_date: date, end_date: date = None
+        start_date: date, end_date: date = None, store_id: Optional[UUID] = None
     ) -> AnalyticsResponse:
         """
         Get analytics data for a date range with daily breakdowns.
@@ -49,30 +50,54 @@ class AnalyticsService:
             current_datetime_end = datetime.combine(current_date, datetime.max.time())
             
             # Get customers count for the day
-            customers = await User.filter(
+            customer_query = User.filter(
                 role__name="Cliente",
                 created_at__gte=current_datetime_start,
                 created_at__lte=current_datetime_end
-            ).count()
+            )
+            
+            # Filter by store_id if provided
+            if store_id:
+                customer_query = customer_query.filter(store_id=store_id)
+                
+            customers = await customer_query.count()
             
             # Get vendors count for the day
-            vendors = await User.filter(
+            vendor_query = User.filter(
                 role__name="Vendedor",
                 created_at__gte=current_datetime_start,
                 created_at__lte=current_datetime_end
-            ).count()
+            )
+            
+            # Filter by store_id if provided
+            if store_id:
+                vendor_query = vendor_query.filter(store_id=store_id)
+                
+            vendors = await vendor_query.count()
             
             # Get devices count for the day
-            devices = await Device.filter(
+            device_query = Device.filter(
                 created_at__gte=current_datetime_start,
                 created_at__lte=current_datetime_end
-            ).count()
+            )
+            
+            # Filter by store_id if provided - devices are linked to users through enrolment
+            if store_id:
+                device_query = device_query.filter(enrolment__user__store_id=store_id)
+                
+            devices = await device_query.count()
             
             # Get payments value for the day
-            payments = await Payment.filter(
+            payment_query = Payment.filter(
                 date__gte=current_datetime_start,
                 date__lte=current_datetime_end
-            ).all()
+            )
+            
+            # Filter by store_id if provided
+            if store_id:
+                payment_query = payment_query.filter(plan__user__store_id=store_id)
+                
+            payments = await payment_query.all()
             payments_value = sum(float(payment.value) for payment in payments)
             
             # Add to totals
@@ -102,7 +127,7 @@ class AnalyticsService:
 
     @staticmethod
     async def generate_analytics_excel(
-        start_date: date, end_date: date = None
+        start_date: date, end_date: date = None, store_id: Optional[UUID] = None
     ) -> BytesIO:
         """
         Generate Excel file with detailed analytics data for a date range.
@@ -129,27 +154,51 @@ class AnalyticsService:
         center_alignment = Alignment(horizontal="center")
 
         # Get detailed data
-        customers = await User.filter(
+        customer_query = User.filter(
             created_at__gte=start_datetime,
             created_at__lte=end_datetime,
             role__name="Cliente"
-        ).prefetch_related("role", "city")
+        )
+        
+        # Filter by store_id if provided
+        if store_id:
+            customer_query = customer_query.filter(store_id=store_id)
+            
+        customers = await customer_query.prefetch_related("role", "city")
 
-        vendors = await User.filter(
+        vendor_query = User.filter(
             created_at__gte=start_datetime,
             created_at__lte=end_datetime,
             role__name="Vendedor"
-        ).prefetch_related("role", "city")
+        )
+        
+        # Filter by store_id if provided
+        if store_id:
+            vendor_query = vendor_query.filter(store_id=store_id)
+            
+        vendors = await vendor_query.prefetch_related("role", "city")
 
-        devices = await Device.filter(
+        device_query = Device.filter(
             created_at__gte=start_datetime,
             created_at__lte=end_datetime
-        ).prefetch_related("enrolment")
+        )
+        
+        # Filter by store_id if provided
+        if store_id:
+            device_query = device_query.filter(enrolment__user__store_id=store_id)
+            
+        devices = await device_query.prefetch_related("enrolment")
 
-        payments = await Payment.filter(
+        payment_query = Payment.filter(
             date__gte=start_datetime,
             date__lte=end_datetime
-        ).prefetch_related("device", "plan")
+        )
+        
+        # Filter by store_id if provided
+        if store_id:
+            payment_query = payment_query.filter(plan__user__store_id=store_id)
+            
+        payments = await payment_query.prefetch_related("device", "plan")
 
         # Summary section
         ws["A1"] = "REPORTE DE ANALYTICS"

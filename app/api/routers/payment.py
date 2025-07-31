@@ -42,9 +42,11 @@ async def get_all_payments(
             "device", "device__enrolment", "device__enrolment__user"
         )
         
-        # If store_id is provided, filter payments where the plan's user belongs to the specified store
+        # If store_id is provided, filter payments where either the plan's user or vendor belongs to the specified store
         if store_id:
-            query = query.filter(plan__user__store_id=store_id)
+            # Using Q objects to create an OR condition for filtering by store_id
+            from tortoise.expressions import Q
+            query = query.filter(Q(plan__user__store_id=store_id) | Q(plan__vendor__store_id=store_id))
             
         # Apply pagination
         payments = await query.offset(skip).limit(limit).all()
