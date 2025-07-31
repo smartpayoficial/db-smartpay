@@ -21,6 +21,7 @@ async def create_payment(new_payment: PaymentCreate):
 async def get_all_payments(
     plan_id: Optional[UUID] = Query(None),
     device_id: Optional[UUID] = Query(None),
+    store_id: Optional[UUID] = Query(None, description="Filter payments by store_id of the user"),
     skip: int = Query(0, ge=0, description="Número de registros a omitir"),
     limit: int = Query(100, ge=1, le=1000, description="Número de registros a devolver")
 ):
@@ -34,12 +35,19 @@ async def get_all_payments(
         filters["device_id"] = device_id
     
     try:
-        # Prefetch related entities
-        payments = await crud_payment.model.filter(**filters).offset(skip).limit(limit).prefetch_related(
-            "plan", "plan__user", "plan__user__role",
-            "plan__vendor", "plan__vendor__role",
+        # Create base query with prefetch related entities
+        query = crud_payment.model.filter(**filters).prefetch_related(
+            "plan", "plan__user", "plan__user__role", "plan__user__store",
+            "plan__vendor", "plan__vendor__role", "plan__vendor__store",
             "device", "device__enrolment", "device__enrolment__user"
-        ).all()
+        )
+        
+        # If store_id is provided, filter payments where the plan's user belongs to the specified store
+        if store_id:
+            query = query.filter(plan__user__store_id=store_id)
+            
+        # Apply pagination
+        payments = await query.offset(skip).limit(limit).all()
         
         payment_list = []
         for payment in payments:
