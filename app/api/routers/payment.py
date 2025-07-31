@@ -32,64 +32,33 @@ async def get_all_payments(
     print(f"DEBUG: get_all_payments called with store_id={store_id}", file=sys.stderr)
     
     try:
-        # If store_id is provided, we need a completely different approach
+        # Construir payload para el método get_all
+        payload = {}
+        if plan_id:
+            payload["plan_id"] = plan_id
+        if device_id:
+            payload["device_id"] = device_id
+            
+        # Obtener todos los pagos con los filtros básicos
+        payments = await crud_payment.get_all(skip=skip, limit=limit, payload=payload)
+        
+        # Si se proporciona store_id, filtrar pagos donde el usuario o vendedor del plan pertenece a la tienda especificada
         if store_id:
-            print(f"DEBUG: Using manual filtering for store_id={store_id}", file=sys.stderr)
-            
-            # First, get all payments with their related data
-            all_payments = await crud_payment.model.all().prefetch_related(
-                "plan", "plan__user", "plan__user__role", "plan__user__store",
-                "plan__vendor", "plan__vendor__role", "plan__vendor__store",
-                "device", "device__enrolment", "device__enrolment__user"
-            )
-            
-            # Now manually filter the payments by store_id
+            print(f"DEBUG: Filtering payments for store_id={store_id}", file=sys.stderr)
             filtered_payments = []
-            for payment in all_payments:
-                # Check if plan's user or vendor belongs to the specified store
-                user_store_id = payment.plan.user.store_id if payment.plan and payment.plan.user and payment.plan.user.store else None
-                vendor_store_id = payment.plan.vendor.store_id if payment.plan and payment.plan.vendor and payment.plan.vendor.store else None
-                
-                # Debug output for each payment
-                print(f"DEBUG: Payment {payment.payment_id} - User store_id: {user_store_id}, Vendor store_id: {vendor_store_id}", file=sys.stderr)
-                
-                # Add to filtered list if either user or vendor belongs to the specified store
-                if str(user_store_id) == str(store_id) or str(vendor_store_id) == str(store_id):
+            for payment in payments:
+                # Verificar si el pago tiene un plan con usuario o vendedor asociado a la tienda
+                if payment.plan and (
+                    (payment.plan.user and payment.plan.user.store_id == store_id) or
+                    (payment.plan.vendor and payment.plan.vendor.store_id == store_id)
+                ):
                     filtered_payments.append(payment)
             
-            # Apply pagination to filtered payments
-            start = skip
-            end = skip + limit
-            paginated_payments = filtered_payments[start:end]
-            
-            print(f"DEBUG: Manually filtered - Found {len(filtered_payments)} payments for store_id={store_id}, returning {len(paginated_payments)} after pagination", file=sys.stderr)
-            
-            # Return the paginated filtered payments
-            return JSONResponse(
-                content=jsonable_encoder([payment for payment in paginated_payments]),
-                status_code=200
-            )
+            # Debug output
+            print(f"DEBUG: Filtered - Found {len(filtered_payments)} payments for store_id={store_id}", file=sys.stderr)
+            payments = filtered_payments
         
-        # If no store_id provided, use the standard approach
-        query = crud_payment.model
-        
-        # Apply other filters
-        if plan_id:
-            query = query.filter(plan_id=plan_id)
-        if device_id:
-            query = query.filter(device_id=device_id)
-        
-        # Add prefetch related entities
-        query = query.prefetch_related(
-            "plan", "plan__user", "plan__user__role", "plan__user__store",
-            "plan__vendor", "plan__vendor__role", "plan__vendor__store",
-            "device", "device__enrolment", "device__enrolment__user"
-        )
-            
-        # Apply pagination
-        payments = await query.offset(skip).limit(limit).all()
-        print(f"DEBUG: Number of payments returned: {len(payments)}", file=sys.stderr)
-        
+        # Format the response
         payment_list = []
         for payment in payments:
             payment_dict = {
@@ -137,8 +106,11 @@ async def get_all_payments(
         
         return payment_list
     except Exception as e:
-        print(f"DEBUG: Error al obtener pagos: {str(e)}", file=sys.stderr)
-        raise HTTPException(status_code=500, detail="Error retrieving payments")
+        print(f"ERROR: Exception in get_all_payments: {str(e)}", file=sys.stderr)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving payments: {str(e)}"
+        )
 
 @router.get("/{payment_id}", response_class=JSONResponse, response_model=PaymentResponse, status_code=200)
 async def get_payment_by_id(payment_id: UUID = Path(...)):

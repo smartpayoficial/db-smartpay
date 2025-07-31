@@ -1,7 +1,7 @@
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Path, Query
+from fastapi import APIRouter, HTTPException, Path, Query, status
 from fastapi.responses import JSONResponse
 
 from app.schemas.payment import PlanCreate, PlanUpdate, PlanDB, PlanResponse
@@ -20,30 +20,53 @@ async def get_all_plans(
     user_id: Optional[UUID] = Query(None, description="Filter plans by user_id"),
     store_id: Optional[UUID] = Query(None, description="Filter plans by store_id")
 ):
-    filters = {}
-    if device_id:
-        filters["device_id"] = device_id
-    if user_id:
-        filters["user_id"] = user_id
+    import sys
     
-    # Define the related fields to prefetch
-    prefetch_fields = [
-        "user", "user__role", "user__store",
-        "vendor", "vendor__role", "vendor__store",
-        "device", "device__enrolment", 
-        "device__enrolment__user", "device__enrolment__user__role",
-        "device__enrolment__vendor", "device__enrolment__vendor__role"
-    ]
-    
-    # Get all plans with prefetched related data
-    query = crud_plan.model.filter(**filters).prefetch_related(*prefetch_fields)
-    
-    # If store_id is provided, filter plans where the user belongs to the specified store
+    # Debug log for parameters
     if store_id:
-        query = query.filter(user__store_id=store_id)
+        print(f"DEBUG: get_all_plans called with store_id={store_id}", file=sys.stderr)
     
-    plans = await query
-    return plans
+    try:
+        # Construir payload para el método get_all
+        payload = {}
+        if device_id:
+            payload["device_id"] = device_id
+        if user_id:
+            payload["user_id"] = user_id
+        
+        # Definir campos a precargar
+        prefetch_fields = [
+            "user", "user__role", "user__store",
+            "vendor", "vendor__role", "vendor__store",
+            "device", "device__enrolment", 
+            "device__enrolment__user", "device__enrolment__user__role",
+            "device__enrolment__vendor", "device__enrolment__vendor__role"
+        ]
+        
+        # Obtener todos los planes con los filtros básicos
+        plans = await crud_plan.get_all(payload=payload, prefetch_fields=prefetch_fields)
+        
+        # Si se proporciona store_id, filtrar planes donde el usuario o vendedor pertenece a la tienda especificada
+        if store_id:
+            print(f"DEBUG: Filtering plans for store_id={store_id}", file=sys.stderr)
+            filtered_plans = []
+            for plan in plans:
+                # Verificar si el plan tiene un usuario o vendedor asociado a la tienda
+                if (plan.user and plan.user.store_id == store_id) or \
+                   (plan.vendor and plan.vendor.store_id == store_id):
+                    filtered_plans.append(plan)
+            
+            # Debug output
+            print(f"DEBUG: Filtered - Found {len(filtered_plans)} plans for store_id={store_id}", file=sys.stderr)
+            plans = filtered_plans
+        
+        return plans
+    except Exception as e:
+        print(f"ERROR: Exception in get_all_plans: {str(e)}", file=sys.stderr)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving plans: {str(e)}"
+        )
 
 @router.get("/{plan_id}", response_class=JSONResponse, response_model=PlanResponse, status_code=200)
 async def get_plan_by_id(plan_id: UUID = Path(...)):

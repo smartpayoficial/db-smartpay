@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict
 from uuid import UUID
 
-from fastapi import APIRouter, Query, HTTPException, Path
+from fastapi import APIRouter, HTTPException, Path, Query, status
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.device import DeviceCreate, DeviceDB, DeviceUpdate
@@ -20,15 +20,49 @@ router = APIRouter()
 )
 async def get_all_devices(
     enrolment_id: Optional[str] = Query(None),
-    user_id: Optional[str] = Query(None)
+    user_id: Optional[str] = Query(None),
+    store_id: Optional[UUID] = Query(None, description="Filter devices by store_id of the user")
 ):
-    payload = {}
-    if enrolment_id:
-        payload["enrolment_id"] = enrolment_id
-    if user_id:
-        payload["user_id"] = user_id
-    devices = await device_service.get_all(payload=payload)
-    return devices
+    import sys
+    
+    # Debug log for parameters
+    if store_id:
+        print(f"DEBUG: get_all_devices called with store_id={store_id}", file=sys.stderr)
+    
+    try:
+        # Construir payload para el servicio
+        payload = {}
+        if enrolment_id:
+            payload["enrolment_id"] = enrolment_id
+        if user_id:
+            payload["user_id"] = user_id
+        
+        # Obtener dispositivos a través del servicio
+        devices = await device_service.get_all(payload=payload)
+        
+        # Si se proporciona store_id, filtrar los dispositivos donde el usuario en el enrollment pertenece a la tienda especificada
+        if store_id:
+            print(f"DEBUG: Filtering devices for store_id={store_id}", file=sys.stderr)
+            filtered_devices = []
+            for device in devices:
+                # Verificar si el dispositivo tiene un enrollment con usuario o vendedor asociado a la tienda
+                if device.enrolment and (
+                    (device.enrolment.user and device.enrolment.user.store_id == store_id) or
+                    (device.enrolment.vendor and device.enrolment.vendor.store_id == store_id)
+                ):
+                    filtered_devices.append(device)
+            
+            # Debug output
+            print(f"DEBUG: Filtered - Found {len(filtered_devices)} devices for store_id={store_id}", file=sys.stderr)
+            return filtered_devices
+        
+        return devices
+    except Exception as e:
+        print(f"ERROR: Exception in get_all_devices: {str(e)}", file=sys.stderr)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error retrieving devices: {str(e)}"
+        )
 
 
 @router.post(
