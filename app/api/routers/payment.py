@@ -1,8 +1,9 @@
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Query, HTTPException, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Query, status
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 
 from app.schemas.payment import PaymentCreate, PaymentUpdate, PaymentResponse
 from app.infra.postgres.models.payment import Payment
@@ -27,29 +28,67 @@ async def get_all_payments(
 ):
     import sys
     
-    # Crear un diccionario de filtros
-    filters = {}
-    if plan_id:
-        filters["plan_id"] = plan_id
-    if device_id:
-        filters["device_id"] = device_id
+    # Debug log for parameters
+    print(f"DEBUG: get_all_payments called with store_id={store_id}", file=sys.stderr)
     
     try:
-        # Create base query with prefetch related entities
-        query = crud_payment.model.filter(**filters).prefetch_related(
+        # If store_id is provided, we need a completely different approach
+        if store_id:
+            print(f"DEBUG: Using manual filtering for store_id={store_id}", file=sys.stderr)
+            
+            # First, get all payments with their related data
+            all_payments = await crud_payment.model.all().prefetch_related(
+                "plan", "plan__user", "plan__user__role", "plan__user__store",
+                "plan__vendor", "plan__vendor__role", "plan__vendor__store",
+                "device", "device__enrolment", "device__enrolment__user"
+            )
+            
+            # Now manually filter the payments by store_id
+            filtered_payments = []
+            for payment in all_payments:
+                # Check if plan's user or vendor belongs to the specified store
+                user_store_id = payment.plan.user.store_id if payment.plan and payment.plan.user and payment.plan.user.store else None
+                vendor_store_id = payment.plan.vendor.store_id if payment.plan and payment.plan.vendor and payment.plan.vendor.store else None
+                
+                # Debug output for each payment
+                print(f"DEBUG: Payment {payment.payment_id} - User store_id: {user_store_id}, Vendor store_id: {vendor_store_id}", file=sys.stderr)
+                
+                # Add to filtered list if either user or vendor belongs to the specified store
+                if str(user_store_id) == str(store_id) or str(vendor_store_id) == str(store_id):
+                    filtered_payments.append(payment)
+            
+            # Apply pagination to filtered payments
+            start = skip
+            end = skip + limit
+            paginated_payments = filtered_payments[start:end]
+            
+            print(f"DEBUG: Manually filtered - Found {len(filtered_payments)} payments for store_id={store_id}, returning {len(paginated_payments)} after pagination", file=sys.stderr)
+            
+            # Return the paginated filtered payments
+            return JSONResponse(
+                content=jsonable_encoder([payment for payment in paginated_payments]),
+                status_code=200
+            )
+        
+        # If no store_id provided, use the standard approach
+        query = crud_payment.model
+        
+        # Apply other filters
+        if plan_id:
+            query = query.filter(plan_id=plan_id)
+        if device_id:
+            query = query.filter(device_id=device_id)
+        
+        # Add prefetch related entities
+        query = query.prefetch_related(
             "plan", "plan__user", "plan__user__role", "plan__user__store",
             "plan__vendor", "plan__vendor__role", "plan__vendor__store",
             "device", "device__enrolment", "device__enrolment__user"
         )
-        
-        # If store_id is provided, filter payments where either the plan's user or vendor belongs to the specified store
-        if store_id:
-            # Using Q objects to create an OR condition for filtering by store_id
-            from tortoise.expressions import Q
-            query = query.filter(Q(plan__user__store_id=store_id) | Q(plan__vendor__store_id=store_id))
             
         # Apply pagination
         payments = await query.offset(skip).limit(limit).all()
+        print(f"DEBUG: Number of payments returned: {len(payments)}", file=sys.stderr)
         
         payment_list = []
         for payment in payments:
