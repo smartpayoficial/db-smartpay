@@ -98,11 +98,8 @@ async def main():
                 index = int(sys.argv[1])
                 if 1 <= index <= len(superadmins):
                     user_to_delete = superadmins[index - 1]
-                    confirm = input(f"\n¿Está seguro de eliminar al usuario {user_to_delete['username']} ({user_to_delete['full_name']})? (s/n): ")
-                    if confirm.lower() == 's':
-                        await delete_user(user_to_delete['user_id'])
-                    else:
-                        print("Operación cancelada.")
+                    print(f"\nEliminando usuario {user_to_delete['username']} ({user_to_delete['full_name']})...")
+                    await delete_user(user_to_delete['user_id'])
                 else:
                     print(f"Índice inválido. Debe ser un número entre 1 y {len(superadmins)}.")
             except ValueError:
