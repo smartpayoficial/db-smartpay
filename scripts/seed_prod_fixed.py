@@ -82,13 +82,14 @@ async def create_user(city_id, role_id, dni, first_name, last_name, email, phone
 async def create_store(name, tokens, plan, admin_id, country_id):
     conn = Tortoise.get_connection("default")
     now = datetime.datetime.utcnow()
+    store_id = str(uuid.uuid4())
     
     query = """
-    INSERT INTO "store" (nombre, tokens_disponibles, plan, admin_id, created_at, updated_at, country_id)
-    VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id
+    INSERT INTO "store" (id, nombre, tokens_disponibles, plan, admin_id, created_at, updated_at, country_id)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
     """
     
-    values = [name, tokens, plan, admin_id, now, now, country_id]
+    values = [store_id, name, tokens, plan, admin_id, now, now, country_id]
     
     try:
         result = await conn.execute_query(query, values)
