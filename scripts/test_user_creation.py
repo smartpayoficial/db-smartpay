@@ -17,7 +17,7 @@ def test_user_creation():
     """Prueba la creación de un usuario haciendo una petición HTTP al endpoint"""
     
     # URL del endpoint de creación de usuarios
-    url = "http://localhost:8000/api/v1/users/"
+    url = "http://localhost:8002/api/v1/users/"
     
     # Datos de prueba para el usuario
     # Generamos un DNI y username únicos basados en la hora actual
