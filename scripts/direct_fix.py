@@ -143,7 +143,8 @@ def run_container():
         -p 8002:8000 \
         -e TZ=UTC \
         -e PYTHONPATH=/usr/src/app \
-        smartpay-db-api
+        smartpay-db-api \
+        uvicorn app.main:app --host 0.0.0.0 --port 8000
         """
         
         result = subprocess.run(
