@@ -71,12 +71,12 @@ def convert_datetime_columns():
     # Comandos SQL para convertir columnas de fecha
     commands = [
         # Convertir columnas de la tabla user
-        "ALTER TABLE \"user\" ALTER COLUMN created_at TYPE timestamp without time zone;",
-        "ALTER TABLE \"user\" ALTER COLUMN updated_at TYPE timestamp without time zone;",
+        "ALTER TABLE user ALTER COLUMN created_at TYPE timestamp without time zone;",
+        "ALTER TABLE user ALTER COLUMN updated_at TYPE timestamp without time zone;",
         
         # Convertir columnas de otras tablas que puedan tener el mismo problema
-        "ALTER TABLE \"plan\" ALTER COLUMN created_at TYPE timestamp without time zone;",
-        "ALTER TABLE \"plan\" ALTER COLUMN updated_at TYPE timestamp without time zone;",
+        "ALTER TABLE plan ALTER COLUMN created_at TYPE timestamp without time zone;",
+        "ALTER TABLE plan ALTER COLUMN updated_at TYPE timestamp without time zone;",
         
         "ALTER TABLE \"payment\" ALTER COLUMN created_at TYPE timestamp without time zone;",
         "ALTER TABLE \"payment\" ALTER COLUMN updated_at TYPE timestamp without time zone;",
