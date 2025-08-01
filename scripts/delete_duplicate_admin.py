@@ -43,7 +43,7 @@ async def list_superadmins():
     for i, row in enumerate(result[1], 1):
         user_id, username, first_name, last_name, email, created_at, role_name = row
         full_name = f"{first_name} {last_name}"
-        print(f"{i:<3} | {user_id:<36} | {username:<15} | {full_name:<20} | {email:<25} | {created_at}")
+        print(f"{i:<3} | {str(user_id):<36} | {username:<15} | {full_name:<20} | {email:<25} | {created_at}")
         superadmins.append({
             "index": i,
             "user_id": user_id,
