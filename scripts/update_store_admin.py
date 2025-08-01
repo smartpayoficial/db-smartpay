@@ -77,7 +77,7 @@ async def list_superadmins():
     SELECT u.user_id, u.username, u.first_name, u.last_name, u.email, u.created_at, r.name as role_name
     FROM "user" u
     JOIN "role" r ON u.role_id = r.role_id
-    WHERE r.name = 'SuperAdmin'
+    WHERE r.name = 'SuperAdmin' OR r.name = 'superadmin'
     """
     
     result = await conn.execute_query(query)
