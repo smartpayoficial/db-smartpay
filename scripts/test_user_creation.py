@@ -22,6 +22,7 @@ def test_user_creation():
     # Datos de prueba para el usuario
     # Generamos un DNI y username únicos basados en la hora actual
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+    short_timestamp = datetime.now().strftime("%H%M%S")
     
     user_data = {
         "first_name": "Usuario",
@@ -30,7 +31,7 @@ def test_user_creation():
         "second_last_name": "",
         "email": f"test{timestamp}@example.com",
         "username": f"test{timestamp}",
-        "dni": f"TEST{timestamp}",
+        "dni": f"TEST{short_timestamp}",
         "prefix": "+57",
         "phone": "3209028935",
         "address": "Dirección de prueba",
