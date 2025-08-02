@@ -12,9 +12,12 @@ class UserState(str, Enum):
 
 class User(Model):
     user_id = fields.UUIDField(pk=True)
+
+    class Meta:
+        unique_together = (('store', 'dni'),)
     city = fields.ForeignKeyField("models.City", related_name="users")
     store = fields.ForeignKeyField("models.Store", related_name="users", null=True, on_delete=fields.SET_NULL)
-    dni = fields.CharField(max_length=16, unique=True)
+    dni = fields.CharField(max_length=16)
     first_name = fields.CharField(max_length=40)
     middle_name = fields.CharField(max_length=40, null=True)
     last_name = fields.CharField(max_length=40)

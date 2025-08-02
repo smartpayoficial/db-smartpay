@@ -86,9 +86,6 @@ async def create_internal_user(new_user: UserCreate):
     exists = await User.filter(email=new_user.email).exists()
     if exists:
         raise HTTPException(status_code=400, detail="Email already exists")
-    exists = await User.filter(dni=new_user.dni).exists()
-    if exists:
-        raise HTTPException(status_code=400, detail="DNI already exists")
 
     # Hash password & save
     hashed_pw = pwd_context.hash(new_user.password)
