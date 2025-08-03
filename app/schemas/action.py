@@ -1,7 +1,7 @@
+from datetime import datetime
 from enum import Enum
 from typing import Optional
 from uuid import UUID
-from datetime import datetime
 
 from pydantic import BaseModel
 
@@ -22,6 +22,8 @@ class ActionType(str, Enum):
     UN_ENROLL = "unenroll"
     UN_BLOCK = "unblock"
     EXCEPTION = "exception"
+    BLOCK_SIM = "block_sim"
+    UNBLOCK_SIM = "unblock_sim"
 
 
 class ActionBase(BaseModel):

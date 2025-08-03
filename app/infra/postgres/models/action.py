@@ -1,11 +1,14 @@
 from enum import Enum
+
 from tortoise import fields
 from tortoise.models import Model
+
 
 class ActionState(str, Enum):
     APPLIED = "applied"
     PENDING = "pending"
     FAILED = "failed"
+
 
 class ActionType(str, Enum):
     BLOCK = "block"
@@ -15,6 +18,9 @@ class ActionType(str, Enum):
     UN_ENROLL = "unenroll"
     UN_BLOCK = "unblock"
     EXCEPTION = "exception"
+    BLOCK_SIM = "block_sim"
+    UNBLOCK_SIM = "unblock_sim"
+
 
 class Action(Model):
     action_id = fields.UUIDField(pk=True)
@@ -30,4 +36,6 @@ class Action(Model):
         table = "action"
 
     def __str__(self):
-        return f"{self.action} on {self.device_id} by {self.applied_by_id} ({self.state})"
+        return (
+            f"{self.action} on {self.device_id} by {self.applied_by_id} ({self.state})"
+        )
