@@ -55,7 +55,6 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         try:
             return await self.crud.create(obj_in=obj_in)
         except IntegrityError as e:
-            print(error_message);
             error_message = str(e).lower()
             if "violates foreign key constraint" in error_message:
                 # This is a generic FK error. More specific ones can be added if needed.
