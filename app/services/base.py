@@ -21,16 +21,19 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         limit: int = 100,
         payload: Optional[Dict[str, Any]] = None,
         prefetch_fields: Optional[List[str]] = None,
+        order_by: Optional[List[str]] = None,
     ) -> List[ModelType]:
         # Parámetros básicos que todas las implementaciones de CRUD aceptan
         base_params = {"skip": skip, "limit": limit}
         if prefetch_fields:
             base_params["prefetch_fields"] = prefetch_fields
-            
+        if order_by:
+            base_params["order_by"] = order_by
+
         # Si no hay filtros, simplemente llamamos al método con los parámetros básicos
         if payload is None:
             return await self.crud.get_all(**base_params)
-            
+
         # Intentamos primero con el parámetro 'filters'
         try:
             filters_params = base_params.copy()

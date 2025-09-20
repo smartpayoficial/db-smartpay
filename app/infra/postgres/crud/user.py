@@ -20,6 +20,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         filters: Optional[Dict[str, Any]] = None,
         skip: int = 0,
         limit: int = 100,
+        order_by: Optional[List[str]] = None,
     ) -> List[User]:
         """
         Obtiene una lista de usuarios, con las relaciones 'role', 'city', 'city__region', 'city__region__country' y 'store' precargadas.
@@ -27,7 +28,16 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         query = self.model.all().select_related("role", "city", "city__region", "city__region__country", "store")
         if filters:
             query = query.filter(**filters)
-        return await query.offset(skip).limit(limit)
+
+        # Apply ordering
+        if order_by:
+            query = query.order_by(*order_by)
+        elif hasattr(self.model, "created_at"):
+            query = query.order_by("-created_at")
+        elif hasattr(self.model, "initial_date"):
+            query = query.order_by("-initial_date")
+
+        return await query.offset(skip).limit(limit).all()
 
     async def create(self, *, obj_in: UserCreate) -> User:
         """
@@ -82,6 +92,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         payload: Optional[Dict[str, Any]] = None,
         skip: int = 0,
         limit: int = 100,
+        order_by: Optional[List[str]] = None,
     ) -> List[User]:
         """
         Obtiene una lista de usuarios aplicando un filtro Q de Tortoise ORM además de los filtros regulares.
@@ -90,7 +101,16 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         query = self.model.filter(q_filter).select_related("role", "city", "city__region", "city__region__country", "store")
         if payload:
             query = query.filter(**payload)
-        return await query.offset(skip).limit(limit)
+
+        # Apply ordering
+        if order_by:
+            query = query.order_by(*order_by)
+        elif hasattr(self.model, "created_at"):
+            query = query.order_by("-created_at")
+        elif hasattr(self.model, "initial_date"):
+            query = query.order_by("-initial_date")
+
+        return await query.offset(skip).limit(limit).all()
 
 
 crud_user = CRUDUser(model=User)

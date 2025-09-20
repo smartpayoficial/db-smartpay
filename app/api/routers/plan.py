@@ -48,7 +48,7 @@ async def get_all_plans(
         ]
 
         # Ejecutamos la consulta final con los prefetch y distinct para evitar duplicados
-        plans = await query.prefetch_related(*prefetch_fields).distinct()
+        plans = await query.order_by("-initial_date").prefetch_related(*prefetch_fields).distinct()
         
         return plans
         
