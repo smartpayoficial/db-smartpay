@@ -9,9 +9,10 @@ RUN pip install --upgrade pip
 RUN pip install pipenv
 COPY Pipfile* ./
 
-# Regenerate the lock file to ensure it's up-to-date before installing
 RUN pipenv lock
-RUN pipenv install --dev --system
+RUN pipenv requirements > requirements.txt
+
+RUN pip install -r requirements.txt
 RUN pip install email-validator
 
 COPY . .

@@ -1,26 +1,26 @@
 -- Set search path to your schema if needed, e.g., SET search_path TO your_schema_name;
 
 -- Insert Countries
-INSERT INTO country (country_id, name, code) VALUES
-(uuid_generate_v4(), 'Argentina', 'AR'),
-(uuid_generate_v4(), 'Bolivia', 'BO'),
-(uuid_generate_v4(), 'Brazil', 'BR'),
-(uuid_generate_v4(), 'Chile', 'CL'),
-(uuid_generate_v4(), 'Colombia', 'CO'),
-(uuid_generate_v4(), 'Costa Rica', 'CR'),
-(uuid_generate_v4(), 'Cuba', 'CU'),
-(uuid_generate_v4(), 'Dominican Republic', 'DO'),
-(uuid_generate_v4(), 'Ecuador', 'EC'),
-(uuid_generate_v4(), 'El Salvador', 'SV'),
-(uuid_generate_v4(), 'Guatemala', 'GT'),
-(uuid_generate_v4(), 'Honduras', 'HN'),
-(uuid_generate_v4(), 'Mexico', 'MX'),
-(uuid_generate_v4(), 'Nicaragua', 'NI'),
-(uuid_generate_v4(), 'Panama', 'PA'),
-(uuid_generate_v4(), 'Paraguay', 'PY'),
-(uuid_generate_v4(), 'Peru', 'PE'),
-(uuid_generate_v4(), 'Uruguay', 'UY'),
-(uuid_generate_v4(), 'Venezuela', 'VE');
+INSERT INTO country (country_id, name, code, phone_code, flag_icon_url) VALUES
+(uuid_generate_v4(), 'Argentina', 'AR', '+54', 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Flag_of_Argentina.svg'),
+(uuid_generate_v4(), 'Bolivia', 'BO', '+591', 'https://upload.wikimedia.org/wikipedia/commons/4/48/Flag_of_Bolivia.svg'),
+(uuid_generate_v4(), 'Brazil', 'BR', '+55', 'https://upload.wikimedia.org/wikipedia/commons/0/05/Flag_of_Brazil.svg'),
+(uuid_generate_v4(), 'Chile', 'CL', '+56', 'https://upload.wikimedia.org/wikipedia/commons/7/78/Flag_of_Chile.svg'),
+(uuid_generate_v4(), 'Colombia', 'CO', '+57', 'https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_Colombia.svg'),
+(uuid_generate_v4(), 'Costa Rica', 'CR', '+506', 'https://upload.wikimedia.org/wikipedia/commons/f/f2/Flag_of_Costa_Rica.svg'),
+(uuid_generate_v4(), 'Cuba', 'CU', '+53', 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Flag_of_Cuba.svg'),
+(uuid_generate_v4(), 'Dominican Republic', 'DO', '+1-809', 'https://upload.wikimedia.org/wikipedia/commons/9/9f/Flag_of_the_Dominican_Republic.svg'),
+(uuid_generate_v4(), 'Ecuador', 'EC', '+593', 'https://upload.wikimedia.org/wikipedia/commons/e/e8/Flag_of_Ecuador.svg'),
+(uuid_generate_v4(), 'El Salvador', 'SV', '+503', 'https://upload.wikimedia.org/wikipedia/commons/3/34/Flag_of_El_Salvador.svg'),
+(uuid_generate_v4(), 'Guatemala', 'GT', '+502', 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Flag_of_Guatemala.svg'),
+(uuid_generate_v4(), 'Honduras', 'HN', '+504', 'https://upload.wikimedia.org/wikipedia/commons/8/82/Flag_of_Honduras_%282022%E2%80%93present%29.svg'),
+(uuid_generate_v4(), 'Mexico', 'MX', '+52', 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Mexico.svg'),
+(uuid_generate_v4(), 'Nicaragua', 'NI', '+505', 'https://upload.wikimedia.org/wikipedia/commons/1/19/Flag_of_Nicaragua.svg'),
+(uuid_generate_v4(), 'Panama', 'PA', '+507', 'https://upload.wikimedia.org/wikipedia/commons/a/ab/Flag_of_Panama.svg'),
+(uuid_generate_v4(), 'Paraguay', 'PY', '+595', 'https://upload.wikimedia.org/wikipedia/commons/2/27/Flag_of_Paraguay.svg'),
+(uuid_generate_v4(), 'Peru', 'PE', '+51', 'https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg'),
+(uuid_generate_v4(), 'Uruguay', 'UY', '+598', 'https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Uruguay.svg'),
+(uuid_generate_v4(), 'Venezuela', 'VE', '+58', 'https://upload.wikimedia.org/wikipedia/commons/0/06/Flag_of_Venezuela.svg');
 
 -- Declare UUID variables for countries
 DO $$

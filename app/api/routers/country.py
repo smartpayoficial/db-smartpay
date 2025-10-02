@@ -7,7 +7,9 @@ from fastapi import APIRouter, HTTPException, Path, Query
 from fastapi.responses import JSONResponse, Response
 
 from app.schemas.country import CountryCreate, CountryDB, CountryUpdate
+from app.schemas.account_type import AccountTypeInDB
 from app.services.country import country_service
+from app.infra.postgres.models.account_type import AccountCategoryEnum
 
 router = APIRouter()
 
@@ -30,7 +32,9 @@ async def get_all_countries_direct():
         result.append({
             "name": country.name,
             "code": country.code,
-            "country_id": country.country_id
+            "country_id": country.country_id,
+            "phone_code": country.phone_code,
+            "flag_icon_url": country.flag_icon_url
         })
     
     return result
@@ -79,6 +83,24 @@ async def get_country_by_id(country_id: UUID = Path(...)):
     if country is None:
         raise HTTPException(status_code=404, detail="Country not found")
     return country
+
+@router.get(
+    "/{country_id}/account-types",
+    response_class=JSONResponse,
+    response_model=List[AccountTypeInDB],
+    status_code=200,
+)
+async def get_country_account_types(
+    country_id: UUID = Path(...),
+    category: Optional[List[AccountCategoryEnum]] = Query(None, description="Filter account types by a list of categories")
+):
+    """Get all available account types for a given country, including international ones. Can be filtered by a list of categories."""
+    # The service needs a list of string values from the enum list
+    categories_str = [c.value for c in category] if category else None
+    account_types = await country_service.get_account_types_by_country(
+        country_id=country_id, categories=categories_str
+    )
+    return account_types
 
 
 @router.patch(

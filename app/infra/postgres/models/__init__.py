@@ -12,6 +12,8 @@ from app.infra.postgres.models.role import Role
 from app.infra.postgres.models.sim import Sim
 from app.infra.postgres.models.store import Store
 from app.infra.postgres.models.user import User
+from app.infra.postgres.models.account_type import AccountType
+from app.infra.postgres.models.store_contact import StoreContact
 
 __all__ = [
     "City",
@@ -29,4 +31,6 @@ __all__ = [
     "Payment",
     "Action",
     "FactoryResetProtection",
+    "AccountType",
+    "StoreContact",
 ]

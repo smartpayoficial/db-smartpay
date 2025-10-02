@@ -44,6 +44,8 @@ class RoleOut(BaseModel):
 class StoreOut(BaseModel):
     id: UUID
     nombre: str
+    tokens_disponibles: Optional[int] = None
+    country_id: Optional[UUID] = None
 
     class Config:
         orm_mode = True
