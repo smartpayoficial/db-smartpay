@@ -1,8 +1,11 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
+from tortoise.fields.relational import ReverseRelation
+
+from app.schemas.store_contact import StoreContactDB
 
 
 class CountryOut(BaseModel):
@@ -12,6 +15,7 @@ class CountryOut(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class RegionOut(BaseModel):
@@ -21,6 +25,7 @@ class RegionOut(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class CityOut(BaseModel):
@@ -30,6 +35,7 @@ class CityOut(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class RoleOut(BaseModel):
@@ -39,6 +45,7 @@ class RoleOut(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class StoreOut(BaseModel):
@@ -46,9 +53,47 @@ class StoreOut(BaseModel):
     nombre: str
     tokens_disponibles: Optional[int] = None
     country_id: Optional[UUID] = None
+    contacts: List[StoreContactDB] = []
+
+    @validator('contacts', pre=True, always=True)
+    def resolve_contacts(cls, v):
+        """Convierte ReverseRelation a lista."""
+        print(f"DEBUG contacts validator - Type: {type(v)}, Value: {v}")
+        
+        # Si es None, retornar lista vacía
+        if v is None:
+            return []
+        
+        # Si es ReverseRelation, necesitamos obtener los objetos relacionados
+        if isinstance(v, ReverseRelation):
+            # Acceder al QuerySet interno
+            if hasattr(v, 'related_objects'):
+                result = list(v.related_objects)
+                print(f"DEBUG: Found {len(result)} items in related_objects")
+                return result
+            
+            # Otra opción: intentar iterar directamente
+            try:
+                # El ReverseRelation puede ser iterable si fue precargado
+                result = list(v)
+                print(f"DEBUG: Converted to list with {len(result)} items")
+                return result
+            except Exception as e:
+                print(f"DEBUG: Could not iterate ReverseRelation: {e}")
+                return []
+        
+        # Si ya es una lista, retornarla
+        if isinstance(v, list):
+            print(f"DEBUG: Already a list with {len(v)} items")
+            return v
+        
+        # Fallback
+        print(f"DEBUG: Unexpected type {type(v)}, returning empty list")
+        return []
 
     class Config:
         orm_mode = True
+        from_attributes = True
 
 
 class UserOut(BaseModel):
@@ -72,3 +117,4 @@ class UserOut(BaseModel):
 
     class Config:
         orm_mode = True
+        from_attributes = True

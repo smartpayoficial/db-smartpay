@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from app.schemas.store_contact import StoreContactDB
+from pydantic import BaseModel, validator
 from app.schemas.country import CountryDB
 from app.schemas.user import UserDB
+from typing import List 
 
+from tortoise.fields.relational import ReverseRelation
 
 class StoreBase(BaseModel):
     nombre: str
@@ -37,7 +40,20 @@ class StoreDB(StoreBase):
     updated_at: datetime
     admin: Optional[UserDB] = None
     country: Optional[CountryDB] = None
-
+    contacts: List[StoreContactDB] = []
+    
+    @validator('contacts', pre=True, always=True)
+    def resolve_contacts(cls, v):
+        """Convierte ReverseRelation a lista."""
+        if v is None:
+            return []
+        if isinstance(v, ReverseRelation):
+            if hasattr(v, '_fetched') and v._fetched is not None:
+                return list(v._fetched) if not isinstance(v._fetched, bool) else []
+            return []
+        if isinstance(v, list):
+            return v
+        return []
     class Config:
         orm_mode = True
         from_attributes = True

@@ -5,9 +5,13 @@ from tortoise.expressions import Q
 from app.infra.postgres.crud.user import crud_user
 from app.infra.postgres.models.user import User
 from app.services.base import BaseService
-
+from uuid import UUID
 
 class UserService(BaseService):
+    async def get_by_id(self, user_id: UUID) -> Optional[User]:
+        """Obtiene un usuario por ID con relaciones precargadas."""
+        return await crud_user.get_by_id(user_id=user_id)
+    
     async def get_by_dni(self, *, dni: str) -> Optional[User]:
         return await self.crud.get_by_dni(dni=dni)
 

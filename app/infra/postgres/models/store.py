@@ -14,6 +14,7 @@ class Store(Model):
     updated_at = fields.DatetimeField(auto_now=True)
     back_link = fields.CharField(max_length=255, null=True)
     db_link = fields.CharField(max_length=255, null=True)
+    contacts: fields.ReverseRelation["StoreContact"]
 
     class Meta:
         table = "store"
