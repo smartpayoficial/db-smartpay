@@ -104,7 +104,9 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             setattr(db_obj, field, value)
         
         await db_obj.save()
-        return db_obj
+        
+        # Devolvemos el objeto con todas las relaciones cargadas
+        return await self.get_by_id(user_id=id)
         
     async def get_by_dni(self, *, dni: str) -> Optional[User]:
         """
