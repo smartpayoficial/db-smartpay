@@ -1,6 +1,8 @@
 from typing import List, Dict, Any, Optional
+from uuid import UUID
 
 from app.infra.postgres.crud.country import crud_country
+from app.infra.postgres.crud.account_type import crud_account_type
 from app.infra.postgres.models.country import Country
 from app.services.base import BaseService
 
@@ -22,6 +24,11 @@ class CountryService(BaseService):
             logger.info(f"After filtering by name, {len(countries)} countries remain")
         
         return countries
+
+    async def get_account_types_by_country(self, *, country_id: UUID, categories: Optional[List[str]] = None):
+        return await crud_account_type.get_by_country_and_category(
+            country_id=country_id, categories=categories
+        )
 
 
 country_service = CountryService(crud=crud_country)

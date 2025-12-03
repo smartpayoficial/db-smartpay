@@ -17,6 +17,8 @@ from .root import router as root_router
 from .sim import router as sim_router
 from .store import router as store_router
 from .user import router as user_router
+from .account_type import router as account_type_router
+from .store_contact import router as store_contact_router
 
 __all__ = [
     "action_router",
@@ -38,4 +40,6 @@ __all__ = [
     "store_router",
     "user_router",
     "factory_reset_protection_router",
+    "account_type_router",
+    "store_contact_router",
 ]

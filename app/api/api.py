@@ -20,6 +20,8 @@ from app.api.routers import (
     sim_router,
     store_router,
     user_router,
+    account_type_router,
+    store_contact_router,
 )
 
 api_router = APIRouter()
@@ -52,3 +54,5 @@ api_router.include_router(role_router, prefix="/roles", tags=["roles"])
 api_router.include_router(sim_router, prefix="/sims", tags=["sims"])
 api_router.include_router(store_router, prefix="/stores", tags=["stores"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])
+api_router.include_router(account_type_router, prefix="/account-types", tags=["account-types"])
+api_router.include_router(store_contact_router, prefix="/store-contacts", tags=["store-contacts"])
