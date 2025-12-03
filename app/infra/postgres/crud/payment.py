@@ -1,6 +1,6 @@
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
-from datetime import datetime, timezone
 
 from app.infra.postgres.crud.base import CRUDBase
 from app.infra.postgres.models.payment import Payment
@@ -70,8 +70,8 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                 "device__enrolment__user__role",
                 "device__enrolment__vendor",
                 "device__enrolment__vendor__role",
-                "television", 
-                "television__enrolment", 
+                "television",
+                "television__enrolment",
                 "television__enrolment__user",
                 "television__enrolment__vendor",
             )
@@ -90,9 +90,9 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                 "plan__vendor",
                 "plan__vendor__role",
                 "plan__device",
-                "plan__television", 
+                "plan__television",
                 "device",
-                "television", 
+                "television",
             )
             .first()
         )

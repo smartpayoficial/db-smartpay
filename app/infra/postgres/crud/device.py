@@ -38,5 +38,7 @@ class CRUDDevice(CRUDBase[Device, DeviceCreate, DeviceUpdate]):
         """
         Obtiene un dispositivo por su IMEI, con relaciones precargadas.
         """
-        return (await self.model.filter(imei=imei).first())
+        return await self.model.filter(imei=imei).first()
+
+
 crud_device = CRUDDevice(model=Device)

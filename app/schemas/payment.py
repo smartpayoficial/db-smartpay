@@ -30,6 +30,7 @@ class PlanBase(BaseModel):
     period: Optional[int] = None
     contract: str
 
+
 class PlanCreate(PlanBase):
     pass
 

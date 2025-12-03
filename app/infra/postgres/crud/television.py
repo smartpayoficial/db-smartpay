@@ -10,11 +10,7 @@ class CRUDTelevision(CRUDBase[Television, TelevisionCreate, TelevisionUpdate]):
         """
         Obtiene un dispositivo por su ID, con las relaciones 'enrolment' y 'actions' precargadas.
         """
-        return (
-            await self.model.filter(pk=id)
-            .prefetch_related("enrolment")
-            .first()
-        )
+        return await self.model.filter(pk=id).prefetch_related("enrolment").first()
 
     async def get_all(
         self,

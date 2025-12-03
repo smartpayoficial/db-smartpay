@@ -1,4 +1,5 @@
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
 from fastapi import HTTPException, status
 from tortoise.exceptions import IntegrityError
 
@@ -14,10 +15,7 @@ class DeviceService(BaseService[Device, DeviceCreate, DeviceUpdate]):
             return await self.crud.create(obj_in=obj_in)
         except IntegrityError as e:
             error_message = str(e).lower()
-            if (
-                "duplicate key" in error_message
-                or "unique constraint" in error_message
-            ):
+            if "duplicate key" in error_message or "unique constraint" in error_message:
                 if "device_imei_key" in error_message:
                     raise HTTPException(
                         status_code=status.HTTP_409_CONFLICT,
@@ -28,11 +26,11 @@ class DeviceService(BaseService[Device, DeviceCreate, DeviceUpdate]):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Database integrity error: {e}",
             )
-            
+
     async def count(self) -> int:
         """
         Count the total number of devices in the system.
-        
+
         Returns:
             int: The total count of devices
         """
@@ -40,5 +38,6 @@ class DeviceService(BaseService[Device, DeviceCreate, DeviceUpdate]):
 
     async def get_by_imei(self, imei: str) -> Optional[Device]:
         return await self.crud.get_by_imei(imei)
-        
+
+
 device_service = DeviceService(crud_device)

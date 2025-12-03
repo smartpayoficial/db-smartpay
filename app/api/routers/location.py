@@ -16,7 +16,9 @@ router = APIRouter()
     response_model=List[LocationDB],
     status_code=200,
 )
-async def get_all_locations(device_id: Optional[UUID] = None, television_id: Optional[UUID] = None):
+async def get_all_locations(
+    device_id: Optional[UUID] = None, television_id: Optional[UUID] = None
+):
     payload = {}
     if device_id:
         payload["device_id"] = device_id

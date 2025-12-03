@@ -16,8 +16,8 @@ from .role import router as role_router
 from .root import router as root_router
 from .sim import router as sim_router
 from .store import router as store_router
-from .user import router as user_router
 from .television import router as television_router
+from .user import router as user_router
 
 __all__ = [
     "action_router",

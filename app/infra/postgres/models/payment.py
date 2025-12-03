@@ -1,4 +1,5 @@
 from enum import Enum
+
 from tortoise import fields
 from tortoise.models import Model
 
@@ -13,8 +14,12 @@ class PaymentState(str, Enum):
 
 class Plan(Model):
     plan_id = fields.UUIDField(pk=True)
-    user = fields.ForeignKeyField("models.User", related_name="user_plans", on_delete=fields.RESTRICT)
-    vendor = fields.ForeignKeyField("models.User", related_name="vendor_plans", on_delete=fields.RESTRICT)
+    user = fields.ForeignKeyField(
+        "models.User", related_name="user_plans", on_delete=fields.RESTRICT
+    )
+    vendor = fields.ForeignKeyField(
+        "models.User", related_name="vendor_plans", on_delete=fields.RESTRICT
+    )
 
     # 🔑 ambos son opcionales ahora
     device = fields.ForeignKeyField(
@@ -56,7 +61,9 @@ class Payment(Model):
         null=True,
         on_delete=fields.RESTRICT,
     )
-    plan = fields.ForeignKeyField("models.Plan", related_name="payments", on_delete=fields.CASCADE)
+    plan = fields.ForeignKeyField(
+        "models.Plan", related_name="payments", on_delete=fields.CASCADE
+    )
 
     value = fields.DecimalField(max_digits=10, decimal_places=2)
     method = fields.CharField(max_length=20)

@@ -8,6 +8,7 @@ class TelevisionState(str, Enum):
     ACTIVE = "Active"
     INACTIVE = "Inactive"
 
+
 class Television(Model):
     television_id = fields.UUIDField(pk=True)
     enrolment = fields.OneToOneField("models.Enrolment", related_name="television")

@@ -1,11 +1,11 @@
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from datetime import datetime
 
 from pydantic import BaseModel
-from app.schemas.enrolment import EnrolmentResponse
 
 from app.infra.postgres.models.device import DeviceState
+from app.schemas.enrolment import EnrolmentResponse
 
 
 class TelevisionBase(BaseModel):
@@ -15,7 +15,7 @@ class TelevisionBase(BaseModel):
     serial_number: str
     board: str
     fingerprint: str
-    state: DeviceState = (DeviceState.ACTIVE) 
+    state: DeviceState = DeviceState.ACTIVE
 
 
 class TelevisionCreate(TelevisionBase):

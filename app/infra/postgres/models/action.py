@@ -17,7 +17,7 @@ class ActionType(str, Enum):
     NOTIFY = "notify"
     UN_ENROLL = "unenroll"
     UN_BLOCK = "unblock"
-    EXCEPTION = "exception" 
+    EXCEPTION = "exception"
     BLOCK_SIM = "block_sim"
     UNBLOCK_SIM = "unblock_s"
 
