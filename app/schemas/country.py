@@ -1,11 +1,14 @@
 from uuid import UUID
 
+from typing import Optional
 from pydantic import BaseModel
 
 
 class CountryBase(BaseModel):
     name: str
     code: str
+    phone_code: Optional[str] = None
+    flag_icon_url: Optional[str] = None
 
 
 class CountryCreate(CountryBase):
@@ -13,11 +16,10 @@ class CountryCreate(CountryBase):
 
 
 class CountryUpdate(BaseModel):
-    # Ajusta los campos según CountryBase, todos opcionales y None por defecto
-    # Ejemplo:
-    # name: Optional[str] = None
-    # code: Optional[str] = None
-    pass
+    name: Optional[str] = None
+    code: Optional[str] = None
+    phone_code: Optional[str] = None
+    flag_icon_url: Optional[str] = None
 
 
 class CountryDB(CountryBase):

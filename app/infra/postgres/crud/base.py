@@ -29,10 +29,20 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):  # type:
         limit: int = 100,
         payload: Dict[str, Any] = {},
         prefetch_fields: Optional[List[str]] = None,
+        order_by: Optional[List[str]] = None,
     ) -> List[ModelType]:
         query = self.model.filter(**payload)
         if prefetch_fields:
             query = query.prefetch_related(*prefetch_fields)
+
+        # Apply ordering
+        if order_by:
+            query = query.order_by(*order_by)
+        elif hasattr(self.model, "created_at"):
+            query = query.order_by("-created_at")
+        elif hasattr(self.model, "initial_date"):
+            query = query.order_by("-initial_date")
+
         return await query.offset(skip).limit(limit).all()
 
     async def create(self, *, obj_in: CreateSchemaType) -> ModelType:

@@ -28,7 +28,11 @@ async def get_all_actions(
         payload["state"] = state
 
     return await action_service.get_all(
-        skip=skip, limit=limit, payload=payload, prefetch_fields=["applied_by__role"]
+        skip=skip,
+        limit=limit,
+        payload=payload,
+        prefetch_fields=["applied_by__role"],
+        order_by=["-created_at"],
     )
 
 

@@ -47,7 +47,7 @@ async def get_all_users(
         )
     if store_id:
         payload["store_id"] = store_id
-    users = await user_service.get_all(payload=payload, skip=skip, limit=limit)
+    users = await user_service.get_all(payload=payload, skip=skip, limit=limit, order_by=["-created_at"])
     return users
 
 
@@ -74,7 +74,7 @@ async def create_user(new_user: UserCreate):
 )
 async def get_user_by_id(user_id: UUID = Path(...)):
     """Obtiene un usuario por su ID."""
-    user = await user_service.get(id=user_id)
+    user = await user_service.get_by_id(user_id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user

@@ -3,6 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Path, Query, status
 from fastapi.responses import JSONResponse
+from tortoise.expressions import Q
 
 from app.infra.postgres.crud.plan import crud_plan
 from app.schemas.payment import PlanCreate, PlanDB, PlanResponse, PlanUpdate
@@ -27,23 +28,26 @@ async def get_all_plans(
     user_id: Optional[UUID] = Query(None, description="Filter plans by user_id"),
     store_id: Optional[UUID] = Query(None, description="Filter plans by store_id"),
 ):
-    import sys
-
-    # Debug log for parameters
-    if store_id:
-        print(f"DEBUG: get_all_plans called with store_id={store_id}", file=sys.stderr)
-
     try:
-        # Construir payload para el método get_all
-        payload = {}
-        if device_id:
-            payload["device_id"] = device_id
-        if television_id:
-            payload["television_id"] = television_id
-        if user_id:
-            payload["user_id"] = user_id
+        # Empezamos con la consulta base para el modelo Plan
+        query = crud_plan.model.all()
 
-        # Definir campos a precargar
+        # Aplicamos los filtros básicos si existen
+        if device_id:
+            query = query.filter(device_id=device_id)
+        if television_id:
+            query = query.filter(television_id=television_id)
+        if user_id:
+            query = query.filter(user_id=user_id)
+
+        # Si se proporciona store_id, aplicamos el filtro con JOIN
+        if store_id:
+            # El objeto Q nos permite crear una condición OR en la base de datos
+            query = query.filter(
+                Q(user__store_id=store_id) | Q(vendor__store_id=store_id)
+            )
+
+        # Definimos las relaciones que queremos precargar
         prefetch_fields = [
             "user",
             "user__role",
@@ -65,31 +69,17 @@ async def get_all_plans(
             "television__enrolment__vendor__role",
         ]
 
-        # Obtener todos los planes con los filtros básicos
-        plans = await crud_plan.get_all(
-            payload=payload, prefetch_fields=prefetch_fields
+        # Ejecutamos la consulta final con los prefetch y distinct para evitar duplicados
+        plans = (
+            await query.order_by("-initial_date")
+            .prefetch_related(*prefetch_fields)
+            .distinct()
         )
 
-        # Si se proporciona store_id, filtrar planes donde el usuario o vendedor pertenece a la tienda especificada
-        if store_id:
-            print(f"DEBUG: Filtering plans for store_id={store_id}", file=sys.stderr)
-            filtered_plans = []
-            for plan in plans:
-                # Verificar si el plan tiene un usuario o vendedor asociado a la tienda
-                if (plan.user and plan.user.store_id == store_id) or (
-                    plan.vendor and plan.vendor.store_id == store_id
-                ):
-                    filtered_plans.append(plan)
-
-            # Debug output
-            print(
-                f"DEBUG: Filtered - Found {len(filtered_plans)} plans for store_id={store_id}",
-                file=sys.stderr,
-            )
-            plans = filtered_plans
-
         return plans
+
     except Exception as e:
+        # Manejo de errores
         print(f"ERROR: Exception in get_all_plans: {str(e)}", file=sys.stderr)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
