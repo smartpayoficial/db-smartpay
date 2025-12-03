@@ -14,6 +14,7 @@ router = APIRouter()
 @router.get("", response_model=List[ActionResponse], response_class=JSONResponse)
 async def get_all_actions(
     device_id: Optional[UUID] = None,
+    television_id: Optional[UUID] = None,
     state: Optional[ActionState] = None,
     skip: int = 0,
     limit: int = 100,
@@ -21,6 +22,8 @@ async def get_all_actions(
     payload = {}
     if device_id:
         payload["device_id"] = device_id
+    if television_id:
+        payload["television_id"] = television_id
     if state:
         payload["state"] = state
 

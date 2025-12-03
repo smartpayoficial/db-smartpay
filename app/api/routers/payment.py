@@ -22,6 +22,7 @@ async def create_payment(new_payment: PaymentCreate):
 async def get_all_payments(
     plan_id: Optional[UUID] = Query(None),
     device_id: Optional[UUID] = Query(None),
+    television_id: Optional[UUID] = Query(None),
     store_id: Optional[UUID] = Query(None, description="Filter payments by store_id of the user"),
     skip: int = Query(0, ge=0, description="Número de registros a omitir"),
     limit: int = Query(100, ge=1, le=1000, description="Número de registros a devolver")
@@ -38,6 +39,8 @@ async def get_all_payments(
             payload["plan_id"] = plan_id
         if device_id:
             payload["device_id"] = device_id
+        if television_id:
+            payload["television_id"] = television_id
             
         # Obtener todos los pagos con los filtros básicos
         payments = await crud_payment.get_all(skip=skip, limit=limit, payload=payload)
@@ -68,7 +71,8 @@ async def get_all_payments(
                 "state": payment.state,
                 "date": payment.date.isoformat(),
                 "reference": payment.reference,
-                "device_id": str(payment.device_id),
+                "device_id": str(payment.device_id)  if payment.device_id else None ,
+                "television_id": str(payment.television_id) if payment.television_id else None,
                 "plan_id": str(payment.plan_id),
                 "device": {
                     "device_id": str(payment.device.device_id),
@@ -80,6 +84,16 @@ async def get_all_payments(
                     "product_name": payment.device.product_name,
                     "state": payment.device.state
                 } if payment.device else None,
+                "television": {
+                    "television_id": str(payment.television.television_id),
+                    "serial_number": payment.television.serial_number,
+                    "model": payment.television.model,
+                    "brand": payment.television.brand,
+                    "android_version": payment.television.android_version,
+                    "board": payment.television.board,
+                    "fingerprint": payment.television.fingerprint,
+                    "state": payment.television.state
+                } if payment.television else None,
                 "plan": {
                     "plan_id": str(payment.plan.plan_id),
                     "user": {

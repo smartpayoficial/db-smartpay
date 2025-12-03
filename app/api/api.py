@@ -20,6 +20,7 @@ from app.api.routers import (
     sim_router,
     store_router,
     user_router,
+    television_router,
 )
 
 api_router = APIRouter()
@@ -51,4 +52,5 @@ api_router.include_router(region_router, prefix="/regions", tags=["regions"])
 api_router.include_router(role_router, prefix="/roles", tags=["roles"])
 api_router.include_router(sim_router, prefix="/sims", tags=["sims"])
 api_router.include_router(store_router, prefix="/stores", tags=["stores"])
+api_router.include_router(television_router, prefix="/televisions", tags=["televisions"])
 api_router.include_router(user_router, prefix="/users", tags=["users"])

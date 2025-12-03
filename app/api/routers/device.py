@@ -105,6 +105,18 @@ async def get_device_by_id(device_id: UUID = Path(...)):
         raise HTTPException(status_code=404, detail="Device not found")
     return device
 
+@router.get(
+    "/imei/{imei}",
+    response_class=JSONResponse,
+    response_model=DeviceDB,
+    status_code=200,
+)
+async def get_device_by_imei(imei: str = Path(...)):
+    device = await device_service.get_by_imei(imei=imei)
+    if device is None:
+        raise HTTPException(status_code=404, detail="Device not found")
+    return device
+
 
 @router.patch(
     "/{device_id}",

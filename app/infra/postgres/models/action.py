@@ -17,14 +17,25 @@ class ActionType(str, Enum):
     NOTIFY = "notify"
     UN_ENROLL = "unenroll"
     UN_BLOCK = "unblock"
-    EXCEPTION = "exception"
+    EXCEPTION = "exception" 
     BLOCK_SIM = "block_sim"
     UNBLOCK_SIM = "unblock_s"
 
 
 class Action(Model):
     action_id = fields.UUIDField(pk=True)
-    device = fields.ForeignKeyField("models.Device", related_name="actions")
+    device = fields.ForeignKeyField(
+        "models.Device",
+        related_name="actions",
+        null=True,
+        on_delete=fields.RESTRICT,
+    )
+    television = fields.ForeignKeyField(
+        "models.Television",
+        related_name="actions",
+        null=True,
+        on_delete=fields.RESTRICT,
+    )
     state = fields.CharEnumField(ActionState, default=ActionState.PENDING)
     applied_by = fields.ForeignKeyField("models.User", related_name="applied_actions")
     action = fields.CharEnumField(ActionType)

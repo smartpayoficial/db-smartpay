@@ -17,6 +17,7 @@ from .root import router as root_router
 from .sim import router as sim_router
 from .store import router as store_router
 from .user import router as user_router
+from .television import router as television_router
 
 __all__ = [
     "action_router",
@@ -38,4 +39,5 @@ __all__ = [
     "store_router",
     "user_router",
     "factory_reset_protection_router",
+    "television_router",
 ]

@@ -17,6 +17,7 @@ async def create_plan(new_plan: PlanCreate):
 @router.get("", response_class=JSONResponse, response_model=List[PlanResponse], status_code=200)
 async def get_all_plans(
     device_id: Optional[UUID] = Query(None, description="Filter plans by device_id"),
+    television_id: Optional[UUID] = Query(None, description="Filter plans by television_id"),
     user_id: Optional[UUID] = Query(None, description="Filter plans by user_id"),
     store_id: Optional[UUID] = Query(None, description="Filter plans by store_id")
 ):
@@ -31,6 +32,8 @@ async def get_all_plans(
         payload = {}
         if device_id:
             payload["device_id"] = device_id
+        if television_id:
+            payload["television_id"] = television_id
         if user_id:
             payload["user_id"] = user_id
         
@@ -40,7 +43,10 @@ async def get_all_plans(
             "vendor", "vendor__role", "vendor__store",
             "device", "device__enrolment", 
             "device__enrolment__user", "device__enrolment__user__role",
-            "device__enrolment__vendor", "device__enrolment__vendor__role"
+            "device__enrolment__vendor", "device__enrolment__vendor__role",
+            "television", "television__enrolment",
+            "television__enrolment__user", "television__enrolment__user__role",
+            "television__enrolment__vendor", "television__enrolment__vendor__role",
         ]
         
         # Obtener todos los planes con los filtros básicos
@@ -76,7 +82,8 @@ async def get_plan_by_id(plan_id: UUID = Path(...)):
         "vendor", "vendor__role", 
         "device", "device__enrolment", 
         "device__enrolment__user", "device__enrolment__user__role",
-        "device__enrolment__vendor", "device__enrolment__vendor__role"
+        "device__enrolment__vendor", "device__enrolment__vendor__role",
+        "television"  # agregar esto
     ).first()
     
     if not plan:

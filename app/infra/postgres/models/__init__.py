@@ -12,8 +12,11 @@ from app.infra.postgres.models.role import Role
 from app.infra.postgres.models.sim import Sim
 from app.infra.postgres.models.store import Store
 from app.infra.postgres.models.user import User
+from app.infra.postgres.models.authentication import Authentication
+from app.infra.postgres.models.television import Television
 
 __all__ = [
+    "Authentication",
     "City",
     "Configuration",
     "Country",
@@ -29,4 +32,5 @@ __all__ = [
     "Payment",
     "Action",
     "FactoryResetProtection",
+    "Television",
 ]
