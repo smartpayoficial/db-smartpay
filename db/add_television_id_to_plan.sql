@@ -1,5 +1,5 @@
 ALTER TABLE plan
-    ADD COLUMN television_id UUID REFERENCES television(television_id) ON DELETE RESTRICT;
+    ADD COLUMN television_id UUID REFERENCES television(television_id) ON DELETE CASCADE;
 
 -- Si quieres permitir que device_id también sea opcional:
 ALTER TABLE plan
@@ -32,7 +32,7 @@ CREATE INDEX IF NOT EXISTS idx_location_device ON location(device_id);
 
 -- Agregar columna para televisores
 ALTER TABLE payment
-    ADD COLUMN television_id UUID REFERENCES television(television_id) ON DELETE RESTRICT;
+    ADD COLUMN television_id UUID REFERENCES television(television_id) ON DELETE CASCADE;
 
 -- Hacer device_id opcional
 ALTER TABLE payment
@@ -49,7 +49,7 @@ CREATE INDEX IF NOT EXISTS idx_payment_television ON payment(television_id);
 
 -- Agregar columna para televisores
 ALTER TABLE action
-    ADD COLUMN television_id UUID REFERENCES television(television_id) ON DELETE RESTRICT;
+    ADD COLUMN television_id UUID REFERENCES television(television_id) ON DELETE CASCADE;
 
 -- Hacer device_id opcional
 ALTER TABLE action
@@ -57,7 +57,7 @@ ALTER TABLE action
 
 -- Constraint para permitir SOLO uno (device o television)
 ALTER TABLE action
-    ADD CONSTRAINT chk_payment_device_or_tv CHECK (
+    ADD CONSTRAINT chk_action_device_or_tv CHECK (
         ((device_id IS NOT NULL)::int + (television_id IS NOT NULL)::int) = 1
     );
 

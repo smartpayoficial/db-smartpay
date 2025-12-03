@@ -15,24 +15,23 @@ class PaymentState(str, Enum):
 class Plan(Model):
     plan_id = fields.UUIDField(pk=True)
     user = fields.ForeignKeyField(
-        "models.User", related_name="user_plans", on_delete=fields.RESTRICT
+        "models.User", related_name="user_plans", on_delete=fields.CASCADE
     )
     vendor = fields.ForeignKeyField(
-        "models.User", related_name="vendor_plans", on_delete=fields.RESTRICT
+        "models.User", related_name="vendor_plans", on_delete=fields.CASCADE
     )
 
-    # 🔑 ambos son opcionales ahora
     device = fields.ForeignKeyField(
         "models.Device",
         related_name="plans",
         null=True,
-        on_delete=fields.RESTRICT,
+        on_delete=fields.CASCADE,
     )
     television = fields.ForeignKeyField(
         "models.Television",
         related_name="plans",
         null=True,
-        on_delete=fields.RESTRICT,
+        on_delete=fields.CASCADE,
     )
 
     initial_date = fields.DateField()
@@ -53,13 +52,13 @@ class Payment(Model):
         "models.Device",
         related_name="payments",
         null=True,
-        on_delete=fields.RESTRICT,
+        on_delete=fields.CASCADE,
     )
     television = fields.ForeignKeyField(
         "models.Television",
         related_name="payments",
         null=True,
-        on_delete=fields.RESTRICT,
+        on_delete=fields.CASCADE,
     )
     plan = fields.ForeignKeyField(
         "models.Plan", related_name="payments", on_delete=fields.CASCADE
