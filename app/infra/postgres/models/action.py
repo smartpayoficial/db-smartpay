@@ -24,7 +24,18 @@ class ActionType(str, Enum):
 
 class Action(Model):
     action_id = fields.UUIDField(pk=True)
-    device = fields.ForeignKeyField("models.Device", related_name="actions")
+    device = fields.ForeignKeyField(
+        "models.Device",
+        related_name="actions",
+        null=True,
+        on_delete=fields.CASCADE,
+    )
+    television = fields.ForeignKeyField(
+        "models.Television",
+        related_name="actions",
+        null=True,
+        on_delete=fields.CASCADE,
+    )
     state = fields.CharEnumField(ActionState, default=ActionState.PENDING)
     applied_by = fields.ForeignKeyField("models.User", related_name="applied_actions")
     action = fields.CharEnumField(ActionType)

@@ -7,6 +7,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from app.schemas.device import DeviceDB
+from app.schemas.television import TelevisionDB
 from app.schemas.user import UserPaymentResponse
 
 
@@ -21,7 +22,8 @@ class PaymentState(str, Enum):
 class PlanBase(BaseModel):
     user_id: UUID
     vendor_id: UUID
-    device_id: UUID
+    device_id: Optional[UUID] = None
+    television_id: Optional[UUID] = None
     initial_date: date
     value: Decimal
     quotas: int
@@ -37,6 +39,7 @@ class PlanUpdate(BaseModel):
     user_id: Optional[UUID] = None
     vendor_id: Optional[UUID] = None
     device_id: Optional[UUID] = None
+    television_id: Optional[UUID] = None
     initial_date: Optional[date] = None
     value: Optional[Decimal] = None
     quotas: Optional[int] = None
@@ -55,14 +58,16 @@ class PlanResponse(PlanBase):
     plan_id: UUID
     user: UserPaymentResponse
     vendor: UserPaymentResponse
-    device: DeviceDB
+    device: Optional[DeviceDB] = None
+    television: Optional[TelevisionDB] = None
 
     class Config:
         orm_mode = True
 
 
 class PaymentBase(BaseModel):
-    device_id: UUID
+    device_id: Optional[UUID] = None
+    television_id: Optional[UUID] = None
     plan_id: UUID
     value: Decimal
     method: str
@@ -77,6 +82,7 @@ class PaymentCreate(PaymentBase):
 
 class PaymentUpdate(BaseModel):
     device_id: Optional[UUID] = None
+    television_id: Optional[UUID] = None
     plan_id: Optional[UUID] = None
     value: Optional[Decimal] = None
     method: Optional[str] = None

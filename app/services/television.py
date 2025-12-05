@@ -3,23 +3,23 @@ from typing import Any, Dict, Optional
 from fastapi import HTTPException, status
 from tortoise.exceptions import IntegrityError
 
-from app.infra.postgres.crud.device import crud_device
-from app.infra.postgres.models.device import Device
-from app.schemas.device import DeviceCreate, DeviceUpdate
+from app.infra.postgres.crud.television import crud_television
+from app.infra.postgres.models.television import Television
+from app.schemas.television import TelevisionCreate, TelevisionUpdate
 from app.services.base import BaseService
 
 
-class DeviceService(BaseService[Device, DeviceCreate, DeviceUpdate]):
-    async def create(self, *, obj_in: DeviceCreate) -> Device:
+class TelevisionService(BaseService[Television, TelevisionCreate, TelevisionUpdate]):
+    async def create(self, *, obj_in: TelevisionCreate) -> Television:
         try:
             return await self.crud.create(obj_in=obj_in)
         except IntegrityError as e:
             error_message = str(e).lower()
             if "duplicate key" in error_message or "unique constraint" in error_message:
-                if "device_imei_key" in error_message:
+                if "serial_number_key" in error_message:
                     raise HTTPException(
                         status_code=status.HTTP_409_CONFLICT,
-                        detail="A device with this IMEI already exists.",
+                        detail="A device with this Serial already exists.",
                     )
             # For other integrity errors, we can be more generic
             raise HTTPException(
@@ -36,8 +36,5 @@ class DeviceService(BaseService[Device, DeviceCreate, DeviceUpdate]):
         """
         return await self.crud.count(payload={})
 
-    async def get_by_imei(self, imei: str) -> Optional[Device]:
-        return await self.crud.get_by_imei(imei)
 
-
-device_service = DeviceService(crud_device)
+television_service = TelevisionService(crud_television)

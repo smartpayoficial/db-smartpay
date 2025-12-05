@@ -32,7 +32,15 @@ class City(Model):
 
 class Location(Model):
     location_id = fields.UUIDField(pk=True)
-    device = fields.ForeignKeyField("models.Device", related_name="locations")
+    device = fields.ForeignKeyField(
+        "models.Device", related_name="locations", null=True, on_delete=fields.RESTRICT
+    )
+    television = fields.ForeignKeyField(
+        "models.Television",
+        related_name="locations",
+        null=True,
+        on_delete=fields.RESTRICT,
+    )
     latitude = fields.FloatField()
     longitude = fields.FloatField()
     created_at = fields.DatetimeField(auto_now_add=True)

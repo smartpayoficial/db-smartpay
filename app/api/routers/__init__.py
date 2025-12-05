@@ -1,3 +1,4 @@
+from .account_type import router as account_type_router
 from .action import router as action_router
 from .analytics import router as analytics_router
 from .authentication import router as auth_router
@@ -16,9 +17,9 @@ from .role import router as role_router
 from .root import router as root_router
 from .sim import router as sim_router
 from .store import router as store_router
-from .user import router as user_router
-from .account_type import router as account_type_router
 from .store_contact import router as store_contact_router
+from .television import router as television_router
+from .user import router as user_router
 
 __all__ = [
     "action_router",
@@ -40,6 +41,7 @@ __all__ = [
     "store_router",
     "user_router",
     "factory_reset_protection_router",
+    "television_router",
     "account_type_router",
     "store_contact_router",
 ]

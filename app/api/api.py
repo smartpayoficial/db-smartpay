@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.routers import (
+    account_type_router,
     action_router,
     analytics_router,
     auth_router,
@@ -18,10 +19,10 @@ from app.api.routers import (
     role_router,
     root_router,
     sim_router,
-    store_router,
-    user_router,
-    account_type_router,
     store_contact_router,
+    store_router,
+    television_router,
+    user_router,
 )
 
 api_router = APIRouter()
@@ -53,6 +54,13 @@ api_router.include_router(region_router, prefix="/regions", tags=["regions"])
 api_router.include_router(role_router, prefix="/roles", tags=["roles"])
 api_router.include_router(sim_router, prefix="/sims", tags=["sims"])
 api_router.include_router(store_router, prefix="/stores", tags=["stores"])
+api_router.include_router(
+    television_router, prefix="/televisions", tags=["televisions"]
+)
 api_router.include_router(user_router, prefix="/users", tags=["users"])
-api_router.include_router(account_type_router, prefix="/account-types", tags=["account-types"])
-api_router.include_router(store_contact_router, prefix="/store-contacts", tags=["store-contacts"])
+api_router.include_router(
+    account_type_router, prefix="/account-types", tags=["account-types"]
+)
+api_router.include_router(
+    store_contact_router, prefix="/store-contacts", tags=["store-contacts"]
+)

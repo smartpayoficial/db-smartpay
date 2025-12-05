@@ -14,6 +14,7 @@ router = APIRouter()
 @router.get("", response_model=List[ActionResponse], response_class=JSONResponse)
 async def get_all_actions(
     device_id: Optional[UUID] = None,
+    television_id: Optional[UUID] = None,
     state: Optional[ActionState] = None,
     skip: int = 0,
     limit: int = 100,
@@ -21,18 +22,28 @@ async def get_all_actions(
     payload = {}
     if device_id:
         payload["device_id"] = device_id
+    if television_id:
+        payload["television_id"] = television_id
     if state:
         payload["state"] = state
 
     return await action_service.get_all(
-        skip=skip, limit=limit, payload=payload, prefetch_fields=["applied_by__role"], order_by=["-created_at"]
+        skip=skip,
+        limit=limit,
+        payload=payload,
+        prefetch_fields=["applied_by__role"],
+        order_by=["-created_at"],
     )
 
-@router.post("", response_model=ActionResponse, response_class=JSONResponse, status_code=201)
+
+@router.post(
+    "", response_model=ActionResponse, response_class=JSONResponse, status_code=201
+)
 async def create_action(new_action: ActionCreate):
     action = await action_service.create(obj_in=new_action)
     await action.fetch_related("applied_by__role")
     return action
+
 
 @router.get("/{action_id}", response_model=ActionResponse, response_class=JSONResponse)
 async def get_action_by_id(action_id: UUID = Path(...)):
@@ -42,7 +53,10 @@ async def get_action_by_id(action_id: UUID = Path(...)):
     await action.fetch_related("applied_by__role")
     return action
 
-@router.patch("/{action_id}", response_model=ActionResponse, response_class=JSONResponse)
+
+@router.patch(
+    "/{action_id}", response_model=ActionResponse, response_class=JSONResponse
+)
 async def update_action(action_id: UUID, update: ActionUpdate):
     updated = await action_service.update(id=action_id, obj_in=update)
     if not updated:
@@ -55,6 +69,7 @@ async def update_action(action_id: UUID, update: ActionUpdate):
 
     await action.fetch_related("applied_by__role")
     return action
+
 
 @router.delete("/{action_id}", response_class=JSONResponse)
 async def delete_action(action_id: UUID):

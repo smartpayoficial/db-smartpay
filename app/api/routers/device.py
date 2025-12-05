@@ -1,4 +1,4 @@
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Path, Query, status
@@ -21,14 +21,18 @@ router = APIRouter()
 async def get_all_devices(
     enrolment_id: Optional[str] = Query(None),
     user_id: Optional[str] = Query(None),
-    store_id: Optional[UUID] = Query(None, description="Filter devices by store_id of the user")
+    store_id: Optional[UUID] = Query(
+        None, description="Filter devices by store_id of the user"
+    ),
 ):
     import sys
-    
+
     # Debug log for parameters
     if store_id:
-        print(f"DEBUG: get_all_devices called with store_id={store_id}", file=sys.stderr)
-    
+        print(
+            f"DEBUG: get_all_devices called with store_id={store_id}", file=sys.stderr
+        )
+
     try:
         # Construir payload para el servicio
         payload = {}
@@ -36,10 +40,10 @@ async def get_all_devices(
             payload["enrolment_id"] = enrolment_id
         if user_id:
             payload["user_id"] = user_id
-        
+
         # Obtener dispositivos a través del servicio
         devices = await device_service.get_all(payload=payload)
-        
+
         # Si se proporciona store_id, filtrar los dispositivos donde el usuario en el enrollment pertenece a la tienda especificada
         if store_id:
             print(f"DEBUG: Filtering devices for store_id={store_id}", file=sys.stderr)
@@ -47,21 +51,30 @@ async def get_all_devices(
             for device in devices:
                 # Verificar si el dispositivo tiene un enrollment con usuario o vendedor asociado a la tienda
                 if device.enrolment and (
-                    (device.enrolment.user and device.enrolment.user.store_id == store_id) or
-                    (device.enrolment.vendor and device.enrolment.vendor.store_id == store_id)
+                    (
+                        device.enrolment.user
+                        and device.enrolment.user.store_id == store_id
+                    )
+                    or (
+                        device.enrolment.vendor
+                        and device.enrolment.vendor.store_id == store_id
+                    )
                 ):
                     filtered_devices.append(device)
-            
+
             # Debug output
-            print(f"DEBUG: Filtered - Found {len(filtered_devices)} devices for store_id={store_id}", file=sys.stderr)
+            print(
+                f"DEBUG: Filtered - Found {len(filtered_devices)} devices for store_id={store_id}",
+                file=sys.stderr,
+            )
             return filtered_devices
-        
+
         return devices
     except Exception as e:
         print(f"ERROR: Exception in get_all_devices: {str(e)}", file=sys.stderr)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error retrieving devices: {str(e)}"
+            detail=f"Error retrieving devices: {str(e)}",
         )
 
 
@@ -85,7 +98,7 @@ async def create_device(new_device: DeviceCreate):
 async def count_devices():
     """
     Count the total number of devices in the system.
-    
+
     Returns:
         CountResponse: Object containing the total count of devices
     """
@@ -106,6 +119,19 @@ async def get_device_by_id(device_id: UUID = Path(...)):
     return device
 
 
+@router.get(
+    "/imei/{imei}",
+    response_class=JSONResponse,
+    response_model=DeviceDB,
+    status_code=200,
+)
+async def get_device_by_imei(imei: str = Path(...)):
+    device = await device_service.get_by_imei(imei=imei)
+    if device is None:
+        raise HTTPException(status_code=404, detail="Device not found")
+    return device
+
+
 @router.patch(
     "/{device_id}",
     response_class=JSONResponse,
@@ -116,7 +142,7 @@ async def update_device(update_device: DeviceUpdate, device_id: UUID = Path(...)
     updated = await device_service.update(id=device_id, obj_in=update_device)
     if not updated:
         raise HTTPException(status_code=404, detail="Device not found")
-    
+
     device = await device_service.get(id=device_id)
     return device
 

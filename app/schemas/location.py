@@ -60,6 +60,7 @@ class CityUpdate(CityBase):
 from datetime import datetime
 from typing import Optional
 
+
 class CityDB(CityBase):
     city_id: UUID
 
@@ -68,7 +69,8 @@ class CityDB(CityBase):
 
 
 class LocationBase(BaseModel):
-    device_id: UUID
+    device_id: Optional[UUID] = None
+    television_id: Optional[UUID] = None
     latitude: float
     longitude: float
 
