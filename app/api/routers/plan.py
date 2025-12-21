@@ -6,7 +6,13 @@ from fastapi.responses import JSONResponse
 from tortoise.expressions import Q
 
 from app.infra.postgres.crud.plan import crud_plan
-from app.schemas.payment import PlanCreate, PlanDB, PlanResponse, PlanUpdate
+from app.schemas.payment import (
+    PlanCreate,
+    PlanDB,
+    PlanResponse,
+    PlanUpdate,
+    PaymentInPlanResponse,
+)
 
 router = APIRouter()
 
@@ -27,60 +33,81 @@ async def get_all_plans(
     ),
     user_id: Optional[UUID] = Query(None, description="Filter plans by user_id"),
     store_id: Optional[UUID] = Query(None, description="Filter plans by store_id"),
-):
+) -> List[PlanResponse]:
     try:
-        # Empezamos con la consulta base para el modelo Plan
         query = crud_plan.model.all()
 
-        # Aplicamos los filtros básicos si existen
         if device_id:
             query = query.filter(device_id=device_id)
         if television_id:
             query = query.filter(television_id=television_id)
         if user_id:
             query = query.filter(user_id=user_id)
-
-        # Si se proporciona store_id, aplicamos el filtro con JOIN
         if store_id:
-            # El objeto Q nos permite crear una condición OR en la base de datos
             query = query.filter(
                 Q(user__store_id=store_id) | Q(vendor__store_id=store_id)
             )
 
-        # Definimos las relaciones que queremos precargar
-        prefetch_fields = [
-            "user",
-            "user__role",
-            "user__store",
-            "vendor",
-            "vendor__role",
-            "vendor__store",
-            "device",
-            "device__enrolment",
-            "device__enrolment__user",
-            "device__enrolment__user__role",
-            "device__enrolment__vendor",
-            "device__enrolment__vendor__role",
-            "television",
-            "television__enrolment",
-            "television__enrolment__user",
-            "television__enrolment__user__role",
-            "television__enrolment__vendor",
-            "television__enrolment__vendor__role",
-        ]
-
-        # Ejecutamos la consulta final con los prefetch y distinct para evitar duplicados
         plans = (
             await query.order_by("-initial_date")
-            .prefetch_related(*prefetch_fields)
+            .prefetch_related(
+                "payments",
+                "user",
+                "user__role",
+                "user__store",
+                "vendor",
+                "vendor__role",
+                "vendor__store",
+                "device",
+                "device__enrolment",
+                "device__enrolment__user",
+                "device__enrolment__user__role",
+                "device__enrolment__vendor",
+                "device__enrolment__vendor__role",
+                "television",
+                "television__enrolment",
+                "television__enrolment__user",
+                "television__enrolment__user__role",
+                "television__enrolment__vendor",
+                "television__enrolment__vendor__role",
+            )
             .distinct()
         )
 
-        return plans
+        # Convertimos cada plan a PlanResponse
+        result = []
+        for plan in plans:
+            plan_response = PlanResponse(
+                plan_id=plan.plan_id,
+                user=plan.user,
+                user_id=plan.user_id,
+                device_id=plan.device_id,
+                vendor_id=plan.vendor_id,
+                vendor=plan.vendor,
+                device=plan.device,
+                television=plan.television,
+                initial_date=plan.initial_date,
+                value=plan.value,
+                quotas=plan.quotas,
+                period=plan.period,
+                contract=plan.contract,
+                payments=[
+                    PaymentInPlanResponse(
+                        payment_id=p.payment_id,
+                        value=p.value,
+                        method=p.method,
+                        state=p.state,
+                        date=p.date,
+                        reference=p.reference,
+                    )
+                    for p in plan.payments
+                ],
+            )
+            result.append(plan_response)
+
+        return result
 
     except Exception as e:
-        # Manejo de errores
-        print(f"ERROR: Exception in get_all_plans: {str(e)}", file=sys.stderr)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error retrieving plans: {str(e)}",
@@ -108,7 +135,8 @@ async def get_plan_by_id(plan_id: UUID = Path(...)):
             "device__enrolment__user__role",
             "device__enrolment__vendor",
             "device__enrolment__vendor__role",
-            "television",  # agregar esto
+            "television",
+            "payments",
         )
         .first()
     )
@@ -172,6 +200,7 @@ async def update_plan(plan_id: UUID, plan_update: PlanUpdate):
             "device__enrolment__user__role",
             "device__enrolment__vendor",
             "device__enrolment__vendor__role",
+            "payments",
         )
         .first()
     )

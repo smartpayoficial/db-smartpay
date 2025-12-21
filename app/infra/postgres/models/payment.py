@@ -2,7 +2,7 @@ from enum import Enum
 
 from tortoise import fields
 from tortoise.models import Model
-
+from tortoise.fields import ReverseRelation
 
 class PaymentState(str, Enum):
     PENDING = "Pending"
@@ -33,6 +33,7 @@ class Plan(Model):
         null=True,
         on_delete=fields.CASCADE,
     )
+    payments: ReverseRelation["Payment"]
 
     initial_date = fields.DateField()
     quotas = fields.SmallIntField()
