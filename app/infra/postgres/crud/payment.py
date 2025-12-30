@@ -64,6 +64,7 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                 "plan__vendor__role",
                 "plan__device",
                 "plan__television",
+                "plan__payments",
                 "device",
                 "device__enrolment",
                 "device__enrolment__user",
@@ -75,13 +76,21 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                 "television__enrolment__user",
                 "television__enrolment__vendor",
             )
+            # Ensure reverse relation 'plan.payments' is a concrete list for Pydantic
+            try:
+                for r in results:
+                    if r.plan:
+                        r.plan.payments = await r.plan.payments.all()
+            except Exception:
+                # If coercion fails, still return results; response building may handle it elsewhere
+                pass
             return results
         except Exception as e:
             logger.error(f"Error al hacer prefetch_related: {str(e)}")
             return await query
 
     async def get_by_id(self, *, _id: UUID) -> Optional[Payment]:
-        return (
+        payment = (
             await self.model.filter(payment_id=_id)
             .prefetch_related(
                 "plan",
@@ -91,11 +100,19 @@ class CRUDPayment(CRUDBase[Payment, PaymentCreate, PaymentUpdate]):
                 "plan__vendor__role",
                 "plan__device",
                 "plan__television",
+                "plan__payments",
                 "device",
                 "television",
             )
             .first()
         )
+        # Coerce plan.payments into a list for Pydantic serialization
+        if payment and payment.plan:
+            try:
+                payment.plan.payments = await payment.plan.payments.all()
+            except Exception:
+                pass
+        return payment
 
 
 crud_payment = CRUDPayment(model=Payment)

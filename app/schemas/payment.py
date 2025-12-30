@@ -5,6 +5,8 @@ from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel
+from typing import List
+from pydantic import Field
 
 from app.schemas.device import DeviceDB
 from app.schemas.television import TelevisionDB
@@ -52,6 +54,33 @@ class PlanDB(PlanBase):
 
     class Config:
         orm_mode = True
+        
+class PaymentOut(BaseModel):
+    payment_id: UUID
+    amount: Decimal
+    date: date
+
+    class Config:
+        orm_mode = True
+
+
+class PlanOut(BaseModel):
+    plan_id: UUID
+    payments: List[PaymentOut]
+
+    class Config:
+        orm_mode = True
+
+class PaymentInPlanResponse(BaseModel):
+    payment_id: UUID
+    value: Decimal
+    method: str
+    state: PaymentState
+    date: datetime
+    reference: str
+
+    class Config:
+        orm_mode = True
 
 
 class PlanResponse(PlanBase):
@@ -60,6 +89,7 @@ class PlanResponse(PlanBase):
     vendor: UserPaymentResponse
     device: Optional[DeviceDB] = None
     television: Optional[TelevisionDB] = None
+    payments: List[PaymentInPlanResponse] = Field(default_factory=list)
 
     class Config:
         orm_mode = True
@@ -98,6 +128,17 @@ class PaymentDB(PaymentBase):
         orm_mode = True
 
 
+class PlanInPaymentResponse(PlanBase):
+    plan_id: UUID
+    user: UserPaymentResponse
+    vendor: UserPaymentResponse
+    device: Optional[DeviceDB] = None
+    television: Optional[TelevisionDB] = None
+
+    class Config:
+        orm_mode = True
+
+
 class PaymentResponse(BaseModel):
     payment_id: UUID
     value: Decimal
@@ -105,7 +146,7 @@ class PaymentResponse(BaseModel):
     state: PaymentState
     date: datetime
     reference: str
-    plan: PlanResponse
+    plan: PlanInPaymentResponse
 
     class Config:
         orm_mode = True
